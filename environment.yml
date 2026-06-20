@@ -1,0 +1,23 @@
+# Local authoring environment — this is where YOU write and test the notebooks
+# in JupyterLab before pushing. Create it with:
+#
+#     conda env create -f environment.yml
+#     conda activate radar-workshop
+#     jupyter lab
+#
+# Note: the packages you import inside notebooks must also be available in the
+# browser (Pyodide). numpy, scipy, matplotlib, pandas, and ipywidgets all are,
+# so this stack is safe for a typical weather-radar tutorial.
+
+name: radar-workshop
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - jupyterlab>=4.4
+  - numpy
+  - scipy
+  - matplotlib
+  - pandas
+  - ipywidgets
+  - pip
