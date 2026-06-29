@@ -1,0 +1,310 @@
+\documentclass[11pt]{article}
+
+% --- encoding & fonts ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+% --- layout ---
+\usepackage[a4paper,margin=2.3cm]{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage[colorlinks=true,linkcolor=teal,urlcolor=teal]{hyperref}
+
+% --- colours / styling ---
+\definecolor{navy}{HTML}{0E2A47}
+\definecolor{teal}{HTML}{1C7293}
+\definecolor{amber}{HTML}{B97E1A}
+\definecolor{cardgray}{HTML}{F2F6F8}
+
+\titleformat{\section}{\color{navy}\Large\bfseries}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\color{teal}\large\bfseries}{}{0em}{}
+\setlist[description]{style=unboxed,leftmargin=0em,itemsep=2pt,font=\normalfont\bfseries\color{navy}}
+
+% --- helper for a boxed block of formulas ---
+\newcommand{\formulahead}[1]{\smallskip\noindent\textit{\color{teal}#1}\par\nopagebreak}
+
+\title{\color{navy}\bfseries Reading the Radar\\[2pt]
+\large\color{black}\mdseries Glossary and Formula Reference --- all five blocks}
+\author{Sebasti\'an Torres \\ \small CIWRO / University of Oklahoma \quad\textbullet\quad sebas@ou.edu}
+\date{Clouds4Africa \textbullet\ July 2026}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\noindent\small This is a companion to the five \emph{Reading the Radar} notebooks. Each section collects the
+specialized terms (with one--line definitions) and the key formulas for one block. Symbols common to several
+blocks are listed once below. Coefficients are the teaching values used in the widgets; operational relations
+vary with wavelength, drop-size distribution, and convention.\normalsize
+
+%==============================================================
+\section*{Common notation}
+\addcontentsline{toc}{section}{Common notation}
+
+\begin{center}\small
+\begin{tabular}{@{}ll@{\hspace{2.5em}}ll@{}}
+\toprule
+Symbol & Meaning & Symbol & Meaning \\
+\midrule
+$c$        & speed of light ($2.998\times10^{8}$ m/s) & $\tau$       & pulse duration (s) \\
+$f$        & transmit frequency (Hz)                  & $\mathrm{PRF}$ & pulse repetition frequency (Hz) \\
+$\lambda$  & wavelength, $\lambda=c/f$ (m)             & $Z$          & reflectivity factor (mm$^6$/m$^3$, or dBZ) \\
+$D$        & antenna (dish) diameter (m)              & $R$          & rain rate (mm/h) \\
+$\theta$   & half-power beamwidth (rad or $^\circ$)   & $N$          & drop-number concentration \\
+$G$        & antenna gain                             & $a_e$        & Earth radius, $6371$ km \\
+$r$        & range from radar (m or km)               & $R_e$        & effective Earth radius (km) \\
+$\varphi$  & elevation (tilt) angle                   & $h$          & beam-centre height (km) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+%==============================================================
+\section{Block 1 --- The beam in space}
+
+\subsection{Terms}
+\begin{description}
+\item[Half-power (3\,dB) beamwidth] the angular width $\theta$ of the beam between the points where transmitted
+power falls to half its peak; fixed in degrees, so the beam's physical width grows with range.
+\item[Antenna gain] the concentration of radiated power into the main lobe relative to an isotropic radiator;
+rises with dish size and falls with wavelength.
+\item[Beam height] the height of the beam centre above the surface; it rises with range because the Earth
+curves away faster than the beam bends down.
+\item[Standard refraction / 4/3-Earth model] the usual downward bending of the beam in a standard atmosphere,
+modelled by replacing the Earth radius with $\tfrac{4}{3}a_e$ and treating the beam as straight.
+\item[Refractivity $N$ and its gradient $dN/dh$] the scaled refractive index of air; its vertical gradient
+controls how strongly the beam bends.
+\item[Effective Earth radius $R_e$] the inflated Earth radius that lets a curved beam be drawn as a straight
+line; $R_e=\tfrac{4}{3}a_e$ under standard refraction.
+\item[Anomalous propagation (anaprop)] any departure from standard refraction --- super-refraction,
+sub-refraction, or ducting --- driven by an unusual refractivity gradient.
+\item[Super-/sub-refraction, ducting] stronger-than-standard downward bending, weaker bending, and (at
+$dN/dh<-157$ N/km) bending that traps the beam near the surface, producing ground returns and false echoes.
+\item[Beam blockage (PBB, CBB)] terrain intercepting part of the beam; \emph{partial} blockage is the fraction
+blocked at a gate, \emph{cumulative} blockage persists for every gate farther downrange.
+\item[Overshooting] the lowest beam passing above shallow low-level weather at long range, so it is missed.
+\end{description}
+
+\subsection{Formulas}
+\formulahead{Beamwidth, width, and gain}
+\begin{align*}
+\lambda = \frac{c}{f}, \qquad
+\theta \approx 1.27\,\frac{\lambda}{D}\ \text{(rad)}, \qquad
+w = r\,\theta, \qquad
+G \propto \left(\frac{D}{\lambda}\right)^{2}.
+\end{align*}
+\formulahead{Beam height (4/3-Earth) and its small-angle split}
+\begin{align*}
+R_e = \tfrac{4}{3}a_e \approx 8495\ \text{km}, \qquad
+h = \sqrt{r^{2}+R_e^{2}+2rR_e\sin\varphi}\;-\;R_e
+\;\approx\; r\sin\varphi + \frac{r^{2}}{2R_e}.
+\end{align*}
+\formulahead{Refraction, ducting, and blockage bias}
+\begin{align*}
+R_{\mathrm{eff}} = \frac{a_e}{1 + a_e\,(dN/dh)\times10^{-6}}, \qquad
+\text{ducting:}\ \ \frac{dN}{dh} < -157\ \tfrac{\text{N}}{\text{km}}
+\ \Longleftrightarrow\ \frac{dM}{dh}<0,\ \ M=N+0.157\,h.
+\end{align*}
+\[
+\text{reflectivity bias} = 10\log_{10}\!\left(1-\mathrm{CBB}\right)\ \text{dB}.
+\]
+
+%==============================================================
+\section{Block 2 --- One measurement}
+
+\subsection{Terms}
+\begin{description}
+\item[Pulse width (duration) $\tau$] the length of the transmitted pulse; it sets range resolution,
+sensitivity, and blind range together.
+\item[Range resolution $\Delta r$] the minimum down-range separation at which two targets are seen as
+distinct, $\Delta r=c\tau/2$.
+\item[Blind range] the near-radar zone the radar cannot listen to while it is transmitting, $\sim c\tau/2$.
+\item[Pulse compression] transmitting a long coded pulse (for sensitivity) and compressing it on receive (for
+resolution), breaking the usual trade.
+\item[Resolution (sample) volume] the box of atmosphere a single measurement averages over: cross-section
+$r\theta$ by depth $c\tau/2$; its volume grows as $r^{2}$.
+\item[Beam filling] whether the resolution volume is fully occupied by weather; a partly filled beam reads
+a value lower than the true peak.
+\item[Reflectivity factor $Z$ (dBZ)] a measure of how much power weather scatters back, set by the drop sizes
+and number; expressed logarithmically as dBZ.
+\item[Weather radar equation] the relation giving received power from transmit power, antenna, wavelength,
+range, and $Z$.
+\item[Minimum detectable reflectivity (MDS)] the weakest $Z$ a radar can detect at a given range; it rises
+with range.
+\item[Distributed vs.\ point target] weather fills the volume (echo falls as $r^{-2}$); a discrete target does
+not (echo falls as $r^{-4}$).
+\end{description}
+
+\subsection{Formulas}
+\formulahead{Resolution, sensitivity, sample volume}
+\begin{align*}
+\Delta r = \frac{c\tau}{2}, \qquad
+\text{sensitivity} \propto \tau\ (+3\ \text{dB per doubling}), \qquad
+V \approx (r\theta)^{2}\,\frac{c\tau}{2}\ \propto\ r^{2}.
+\end{align*}
+\formulahead{Weather radar equation and minimum detectable $Z$ (fixed dish)}
+\begin{align*}
+P_r \propto \frac{P_t\,D^{2}\,\tau\,Z}{\lambda^{4}\,r^{2}}, \qquad
+Z_{\min} \propto \frac{\lambda^{4}\,r^{2}}{P_t\,D^{2}\,\tau}.
+\end{align*}
+\formulahead{Sensitivity rules of thumb}
+\begin{align*}
+&+6\ \text{dB per range doubling (distributed targets)}, \qquad
+\times2\ \text{power}=-3\ \text{dB}, \\[2pt]
+&\times2\ \text{dish}=-6\ \text{dB}, \qquad
+\text{S}\!\to\!\text{X (fixed dish)}\approx-21\ \text{dB}.
+\end{align*}
+
+%==============================================================
+\section{Block 3 --- Range, velocity, and ambiguity}
+
+\subsection{Terms}
+\begin{description}
+\item[Pulse repetition frequency / time (PRF, PRT)] how often pulses are sent ($\mathrm{PRT}=1/\mathrm{PRF}$);
+the single knob that sets both range and velocity limits.
+\item[Maximum unambiguous range $r_{\max}$] the farthest range whose echo returns before the next pulse;
+beyond it, echoes are misplaced.
+\item[Second-trip echo / range folding] an echo from beyond $r_{\max}$ shown at (true range $-\,r_{\max}$).
+\item[Nyquist velocity $v_{\mathrm{nyq}}$] the largest unambiguous radial velocity; faster motion aliases.
+\item[Velocity aliasing (folding)] a velocity beyond $\pm v_{\mathrm{nyq}}$ wrapping into the window, so fast
+outbound motion can read as inbound.
+\item[Doppler dilemma] the fixed trade $r_{\max}\,v_{\max}=c\lambda/8$: raising PRF buys velocity but spends
+range, and vice versa.
+\item[Dual-PRF / staggered PRT] transmitting two interleaved pulse rates and combining them to raise the
+effective Nyquist beyond the single-PRF curve.
+\item[Surveillance vs.\ Doppler sweep] a low-PRF scan for long-range reflectivity (no velocity) and a high-PRF
+scan for velocity (short range).
+\end{description}
+
+\subsection{Formulas}
+\formulahead{Range, velocity, and the dilemma}
+\begin{align*}
+r_{\max} = \frac{c}{2\,\mathrm{PRF}}, \qquad
+v_{\mathrm{nyq}} = \frac{\lambda\,\mathrm{PRF}}{4}, \qquad
+r_{\max}\,v_{\max} = \frac{c\lambda}{8}.
+\end{align*}
+\formulahead{Folding and dual-PRF extension}
+\begin{align*}
+v_{\text{disp}} = \big[(v+v_{\mathrm{nyq}}) \bmod 2v_{\mathrm{nyq}}\big] - v_{\mathrm{nyq}}, \qquad
+v_{\text{ext}} = \frac{v_1 v_2}{\lvert v_1 - v_2\rvert}.
+\end{align*}
+
+%==============================================================
+\section{Block 4 --- Wavelength, weather, and the scan}
+
+\subsection{Terms}
+\begin{description}
+\item[Attenuation] energy absorbed and scattered out of the beam by rain, so weather behind a cell is seen
+through a curtain; negligible at S, real at C, severe at X.
+\item[Specific attenuation $k$] the loss per unit path length, $k=aR^{b}$ (dB/km), one-way.
+\item[Path-integrated attenuation (PIA)] the accumulated two-way loss along the beam, $2\!\int k\,dr$.
+\item[Wavelength bands (S, C, X)] $\sim$10\,cm, $\sim$5\,cm, $\sim$3\,cm; shorter wavelengths are more
+sensitive but attenuate more.
+\item[Detectability crossover] the range where a shorter wavelength's sensitivity head-start is overtaken by
+its accumulated attenuation.
+\item[Volume Coverage Pattern (VCP)] the stack of elevation tilts a radar scans to build a volume.
+\item[Cone of silence] the cone above the top tilt that the radar never samples; half-angle $90^\circ-$(top tilt).
+\item[Volume (update) time] the time to complete one VCP; grows with the number of tilts.
+\item[Phased array] an electronically-steered antenna that revisits faster, easing the coverage-vs-time trade.
+\item[$Z$--$R$ relation] the empirical link from reflectivity to rain rate used for QPE, e.g.\ $Z=200R^{1.6}$.
+\end{description}
+
+\subsection{Formulas}
+\formulahead{Attenuation, rainfall, and sensitivity gap}
+\begin{align*}
+k = a\,R^{b}\ \text{(dB/km)}, \qquad
+\mathrm{PIA} = 2\!\int_0^r k\,ds, \qquad
+Z = 200\,R^{1.6}, \qquad
+\Delta Z_{\min}^{\,\text{X--S}}\approx 21\ \text{dB (fixed dish)}.
+\end{align*}
+\formulahead{Power with band specifications, and scan timing}
+\begin{align*}
+P_r \propto \frac{P_t}{\theta^{2}\lambda^{2}}
+\ \ (\text{$\times$2 power}=+3\,\text{dB},\ \tfrac{1^\circ}{0.5^\circ}\,\text{beam}=+6\,\text{dB},\ \lambda^{2}=+6\,\text{dB}),
+\qquad
+t_{\text{vol}} = N_{\text{tilts}}\cdot\frac{60}{\text{rpm}}.
+\end{align*}
+
+\formulahead{Teaching coefficients}
+\begin{center}\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Band & $\lambda$ / freq & specific attenuation $a$ ($k=aR$) & relative sensitivity \\
+\midrule
+S & $\sim$10.7\,cm / 2.8\,GHz & $\approx1\times10^{-4}$ & reference \\
+C & $\sim$5.4\,cm / 5.6\,GHz  & $\approx6\times10^{-3}$ & more sensitive, attenuates more \\
+X & $\sim$3.2\,cm / 9.4\,GHz  & $\approx3\times10^{-2}$ & $\approx+21$ dB vs.\ S, attenuates most \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+%==============================================================
+\section{Block 5 --- Two polarizations}
+
+\subsection{Terms}
+\begin{description}
+\item[Dual-polarization (polarimetric) radar] a radar transmitting and receiving both horizontal (H) and
+vertical (V) waves; comparing them reveals the shape, variety, and phase of the echo.
+\item[Differential reflectivity $Z_{DR}$] the H-to-V power ratio in dB; positive for flattened (large) drops,
+near zero for round particles (drizzle, tumbling hail). Independent of concentration.
+\item[Axis ratio (oblateness)] the vertical-to-horizontal diameter ratio of a drop; falls below 1 as drops
+grow and flatten.
+\item[Correlation coefficient $\rho_{hv}$] how alike the H and V returns are across the volume; $\approx1$ for
+uniform rain, lower for mixtures, very low for non-weather. A purity meter.
+\item[Differential phase $\Phi_{DP}$] the accumulated H-minus-V phase shift along the path; rises monotonically
+through rain and is unaffected by attenuation.
+\item[Specific differential phase $K_{DP}$] the range slope of $\Phi_{DP}$; proportional to rain rate and
+immune to attenuation and calibration.
+\item[Differential attenuation] the extra loss of the H wave relative to V behind heavy rain, which biases
+$Z_{DR}$ (but not $K_{DP}$).
+\item[Melting layer (bright band)] the layer of melting snow producing intermediate $\rho_{hv}$ and a
+reflectivity enhancement.
+\item[Hydrometeor classification] using $Z$, $Z_{DR}$, $\rho_{hv}$, and $K_{DP}$ together to label the echo
+(rain, big drops, hail, melting layer, non-meteorological).
+\end{description}
+
+\subsection{Formulas}
+\formulahead{Differential reflectivity (oblate-spheroid model)}
+\begin{align*}
+\gamma \approx 1.03 - 0.062\,D\ \text{(mm)}, \qquad
+Z_{DR} = 10\log_{10}\!\frac{Z_h}{Z_v}
+= 20\log_{10}\!\frac{L_z+k}{L_x+k}, \qquad k=\frac{1}{\varepsilon-1}.
+\end{align*}
+\formulahead{Correlation coefficient}
+\begin{align*}
+\rho_{hv} = \frac{\bigl|\langle s_h\,s_v^{*}\rangle\bigr|}
+{\sqrt{\langle |s_h|^{2}\rangle\,\langle |s_v|^{2}\rangle}}, \qquad
+\begin{cases}
+\rho_{hv}>0.97 & \text{rain}\\
+0.85\text{--}0.97 & \text{mixed / hail / melting}\\
+<0.85 & \text{non-meteorological}
+\end{cases}
+\end{align*}
+\formulahead{Differential phase and rainfall}
+\begin{align*}
+\Phi_{DP}(r) = 2\!\int_0^{r} K_{DP}\,ds, \qquad
+K_{DP} = \tfrac{1}{2}\,\frac{d\Phi_{DP}}{dr}, \qquad
+R = 44\,K_{DP}^{\,0.82} \ \Longleftrightarrow\ K_{DP}=\left(\tfrac{R}{44}\right)^{1/0.82}.
+\end{align*}
+
+%==============================================================
+\section*{References}
+\addcontentsline{toc}{section}{References}
+\small
+\begin{description}[font=\normalfont]
+\item Rinehart, \emph{Radar for Meteorologists} --- beam geometry, refraction, attenuation, scan strategies.
+\item Doviak \& Zrni\'c, \emph{Doppler Radar and Weather Observations} --- radar equation, ambiguities,
+polarimetry.
+\item Bringi \& Chandrasekar, \emph{Polarimetric Doppler Weather Radar} --- $Z_{DR}$, $\rho_{hv}$, $K_{DP}$.
+\item Fabry, \emph{Radar Meteorology: Principles and Practice} --- intuitive modern treatment.
+\item Bech et al.\ (2003); Carey et al.\ (2000) --- beam blockage; C-band attenuation correction.
+\item NWS / WDTD training (\url{https://training.weather.gov}); Py-ART (\url{https://arm-doe.github.io/pyart}).
+\end{description}
+
+\vfill
+\noindent\footnotesize\textcolor{gray}{Reading the Radar \textbullet\ Clouds4Africa \textbullet\ companion glossary.
+Coefficients are teaching values; reuse under the course license (CC BY-NC 4.0).}
+
+\end{document}
