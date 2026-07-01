@@ -1,0 +1,596 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{parskip}
+
+\definecolor{blockblue}{RGB}{20,60,110}
+\definecolor{qgray}{RGB}{90,90,90}
+
+\titleformat{\section}{\normalfont\Large\bfseries\color{blockblue}}{\thesection}{0.7em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries\color{blockblue}}{\thesubsection}{0.7em}{}
+\titleformat{\subsubsection}{\normalfont\bfseries\itshape}{\thesubsubsection}{0.7em}{}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Reading the Radar --- Answer Key}
+\fancyhead[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\newenvironment{qa}[1]{\par\noindent\textbf{\color{qgray}Q: }\emph{#1}\par\noindent\textbf{A: }}{\par\vspace{6pt}}
+\newcommand{\tier}[1]{\subsubsection*{#1}}
+
+\title{\Huge\bfseries\color{blockblue} Reading the Radar\\[4pt]\Large Complete Answer Key}
+\author{Sebasti\'an Torres \\ CIWRO, University of Oklahoma}
+\date{Clouds4Africa Workshop \\ July 2026 \\[4pt]\normalsize (Facilitator reference --- not for distribution to participants)}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+\newpage
+\tableofcontents
+\newpage
+\section{Block 1 --- The Beam in Space}
+
+\subsection{Widget 1: The beam spreads (beamwidth from the dish)}
+
+\tier{Basic}
+\begin{qa}{At NEXRAD defaults ($f=2.8$ GHz, $D=8.5$ m), what is the beamwidth? How wide is the beam at 100 km versus 200 km?}
+$\theta = 1.27\lambda/D$ with $\lambda = c/f \approx 10.7$ cm gives $\theta \approx 0.92^\circ$. Converting to a physical width at range $r$ via $w=r\theta$ (in radians): at $r=100$ km, $w\approx1.60$ km; at $r=200$ km, $w\approx3.20$ km --- it doubles because width scales linearly with range at fixed angular beamwidth.
+\end{qa}
+\begin{qa}{Shrink the dish to a small, X-band, gap-filler radar ($f=9.4$ GHz, $D=1.5$ m). Does the beam get wider or narrower?}
+Wider: $\theta\approx1.55^\circ$, nearly $70\%$ broader than NEXRAD's $0.92^\circ$. Even though X-band's much shorter wavelength would narrow the beam on its own, the dish is more than five times smaller, and $\theta\propto\lambda/D$ is dominated by the dish shrinkage here.
+\end{qa}
+
+\tier{A little further}
+\begin{qa}{Keep the NEXRAD dish ($D=8.5$ m) and switch toward C-band ($\sim5.6$ GHz). Does the beam narrow or widen --- and why does a shorter wavelength sharpen resolution?}
+It narrows, to $\theta\approx0.46^\circ$ --- almost exactly half of the S-band value, since $\theta\propto\lambda$ and C-band's wavelength is about half of S-band's. A shorter wavelength packs the same aperture's diffraction pattern into a smaller angle, so at any given range the beam (and hence the smallest resolvable feature) is physically narrower.
+\end{qa}
+\begin{qa}{Find a dish size that gives NEXRAD's $\sim0.9^\circ$ beamwidth \emph{at} C-band. Bigger or smaller than 8.5 m?}
+Solving $D = 1.27\lambda/\theta$ at $\lambda_C\approx5.4$ cm and $\theta=0.92^\circ$ gives $D\approx4.25$ m --- smaller than 8.5 m. This is the direct payoff of shifting to a shorter wavelength: the same angular resolution is achievable with roughly half the dish size (and, correspondingly, a much smaller, cheaper, and lighter radar).
+\end{qa}
+
+\tier{Going deeper}
+\begin{qa}{Beamwidth scales as $\lambda/D$, but antenna gain scales as $(D/\lambda)^2$. Double the dish from 5 m to 10 m: confirm the beamwidth halves, then state the corresponding change in antenna gain in dB and what it buys you.}
+At S-band, $\theta(5\,\mathrm{m})\approx1.56^\circ$ and $\theta(10\,\mathrm{m})\approx0.78^\circ$ --- exactly halved, confirming the $1/D$ scaling. Gain scales as $D^2$, so doubling $D$ raises gain by $20\log_{10}(2)\approx6.02$ dB. That extra gain buys sharper angular resolution (finer beam, hence better ability to separate close-together storms and less beam-filling bias) \emph{and} more sensitivity (gain enters the radar equation squared, so it directly extends detection range) --- at the practical cost of a much larger, heavier, and more expensive antenna structure and pedestal.
+\end{qa}
+\begin{qa}{At NEXRAD defaults, the widget shows a beam width of 1.6 km at 100 km and 3.2 km at 200 km. At roughly what range do two cells 2 km apart merge into a single echo? Confirm that width $=r\theta$, then explain why a fixed-dish radar can never hold cross-range resolution constant with range --- unlike along-range resolution, which the pulse keeps fixed.}
+Setting $r\theta = 2$ km with $\theta=0.92^\circ$ ($0.016$ rad) gives $r\approx125$ km: beyond that range, two storms 2 km apart blur into one echo. The formula $w=r\theta$ is confirmed directly by the widget's own numbers: $100\times0.016=1.6$ km and $200\times0.016=3.2$ km, exactly as displayed. The deeper reason a fixed dish can never hold cross-range resolution constant is that beamwidth is fixed in \emph{angle}, not distance --- the antenna diffracts a fixed angular pattern regardless of range, so the corresponding physical footprint necessarily grows linearly with range. Range (along-beam) resolution, by contrast, is set by the pulse duration ($\Delta r = c\tau/2$, Block 2), a purely time-domain quantity with no dependence on range at all --- so a radar's ability to separate targets along the beam stays constant everywhere, while its ability to separate targets across the beam steadily degrades with distance.
+\end{qa}
+
+\subsection{Widget 2: The beam climbs (height and refraction)}
+
+\tier{Basic}
+\begin{qa}{At the $0.5^\circ$ tilt, how high is the beam center at 120 km? At 200 km?}
+Using the 4/3-Earth formula, $h(120\,\mathrm{km},0.5^\circ)\approx1.89$ km and $h(200\,\mathrm{km},0.5^\circ)\approx4.10$ km. The beam climbs by more than a factor of two as range increases by less than a factor of two, since the curvature (range-squared) term grows faster than the linear geometric-rise term.
+\end{qa}
+\begin{qa}{You care about shallow rain at 150 km. Is the lowest beam near the surface, or well above it?}
+Well above it: even at the lowest standard tilt ($0.5^\circ$), the beam center is already at $\approx2.63$ km at 150 km range. Shallow, low-level rain (the first kilometer or so above the surface) is simply not sampled by the lowest tilt at that range --- it has already climbed well past it.
+\end{qa}
+
+\tier{A little further}
+\begin{qa}{Raise the tilt to $1.5^\circ$. How much higher is the beam at 150 km, and when would you accept that (think terrain)?}
+At $1.5^\circ$, $h(150,1.5^\circ)\approx5.25$ km, about 2.62 km higher than at $0.5^\circ$. An operator accepts sampling that much higher when the low tilt is unusable --- most commonly because terrain blocks it (Widget 4) or produces unacceptable ground clutter/AP contamination (Widget 3), so the higher tilt, despite its coverage cost, is the only clean view available.
+\end{qa}
+\begin{qa}{Read the top and bottom of the band at 150 km --- the beam is $\sim$2 km deep. Is that spread from the beamwidth, the refraction, or both?}
+It is purely from beamwidth: the shaded band's top and bottom edges are $h(r,\theta_{\mathrm{elev}}\pm\mathrm{bw}/2)$, i.e.\ the same refraction/height formula evaluated at the beam's upper and lower half-power edges. At 150 km with the default $0.92^\circ$ beamwidth, the band spans roughly 1.43--3.83 km, a $\sim$2.4 km vertical spread. Refraction (the 4/3-Earth curvature) sets \emph{where} the band sits on average; the angular beamwidth sets \emph{how thick} it is.
+\end{qa}
+
+\tier{Going deeper}
+\begin{qa}{At $0.5^\circ$ the beam center is $\sim$2.6 km at 150 km. Split that into the geometric rise ($r\sin\theta$) and the Earth-curvature term ($r^2/2R_e$): compute each. Find the range where the two terms are equal, and show it scales as $2R_e\sin\theta$. Which term dominates near the radar, and which far out?}
+At $r=150$ km, $\theta=0.5^\circ$, $R_e=8495$ km: geometric term $r\sin\theta\approx1.31$ km, curvature term $r^2/(2R_e)\approx1.32$ km --- essentially equal, and together they reproduce the widget's $\approx2.63$ km. Setting the two terms equal, $r\sin\theta = r^2/(2R_e)\Rightarrow r=2R_e\sin\theta$, which numerically gives $r\approx148.3$ km --- almost exactly 150 km, confirming this is close to the crossover point by design of the example. Near the radar (small $r$) the linear geometric term dominates (the beam simply points upward along a straight line); far from the radar the curvature term, growing as $r^2$, eventually dominates (the Earth's curving-away accelerates the apparent climb).
+\end{qa}
+\begin{qa}{A melting layer / bright band sits near 3 km. Find the range at which the $0.5^\circ$ beam center reaches 3 km --- beyond it, low-tilt QPE is sampling ice aloft, not surface rain. Now find that same overshoot range if you're forced up to $1.5^\circ$ (because $0.5^\circ$ is blocked). How much coverage did the blockage cost you?}
+Solving $h(r,0.5^\circ)=3$ km numerically gives $r\approx163.5$ km. At $1.5^\circ$, the same 3 km height is reached at $r\approx94.5$ km. Being forced up to $1.5^\circ$ therefore costs about 69 km of usable low-level (below-melting-layer) range coverage --- the radar can no longer reliably measure surface rain at ranges where the higher tilt has already climbed into the melting layer.
+\end{qa}
+\begin{qa}{The beam isn't a line --- its vertical depth is $\approx r\theta$. Read the top and bottom edges of the shaded band at 150 km and state the height layer the measurement integrates over. Why can't a sharp inversion or a shallow cold pool inside that layer be resolved, no matter how good the radar is?}
+At 150 km the band spans roughly 1.4--3.8 km (top and bottom computed at $\theta_{\mathrm{elev}}\pm\mathrm{bw}/2$), so any single reported value there is a power-weighted average over that entire $\sim$2.4 km-thick layer. A shallow feature --- a sharp temperature inversion or a thin cold pool a few hundred meters thick --- sits entirely inside this averaging window and cannot be isolated from the rest of the layer: the reported value blends it with everything else the beam spans at that height, regardless of how precise the receiver electronics or signal processing are. This is a geometric limitation of the beam's finite angular width, not an electronics limitation, so it cannot be engineered away without changing the antenna or the range.
+\end{qa}
+
+\subsection{Widget 3: The beam bends abnormally (anomalous propagation)}
+
+\tier{Basic}
+\begin{qa}{Set dN/dh to the standard value. What is $k$, and the beam height at 150 km? (Compare with Widget 2.)}
+Standard $dN/dh=-39$ N/km gives $k=R_e/a_e=4/3$ and $h(150\,\mathrm{km},0.5^\circ)\approx2.64$ km --- matching Widget 2's height (both widgets use the same standard-refraction geometry; the small $\sim0.01$ km difference between the exact 4/3-Earth formula and this widget's paraxial approximation is negligible).
+\end{qa}
+\begin{qa}{Drag to strong ducting ($dN/dh=-300$). Where does the beam strike the ground?}
+At $dN/dh=-300$ N/km (well past the $-157$ N/km ducting threshold), $R_e\approx-6991$ km (negative --- the beam curves as sharply as, or more sharply than, the Earth). The $0.5^\circ$ beam strikes the ground at $r\approx122$ km.
+\end{qa}
+
+\tier{A little further}
+\begin{qa}{At what dN/dh does a $0^\circ$ beam stay at constant height --- running parallel to the curved Earth instead of climbing? Reason it from $h\approx r\sin\theta + r^2/(2R_e)$: at $\theta=0$, what value of $R_e$ keeps $h$ from growing with range? Then confirm with the slider.}
+At $\theta=0$, $h\approx r^2/(2R_e)$, which is identically zero for all $r$ only in the limit $R_e\to\infty$. From $R_e = a_e/[1+a_e(dN/dh)\times10^{-6}]$, $R_e\to\infty$ exactly when the denominator vanishes, i.e.\ $dN/dh = -1/(a_e\times10^{-6}) \approx -157.0$ N/km --- precisely the ducting-onset threshold identified elsewhere in this widget. At that gradient the beam curves exactly as sharply as the Earth itself, so a horizontal ($0^\circ$) ray tracks the surface at constant height rather than climbing or descending; slide $dN/dh$ to $-157$ and the $0^\circ$ beam trace should flatten out on the plot.
+\end{qa}
+\begin{qa}{Find the dN/dh that bends the beam into the ridge it normally clears at an elevation of $0.9^\circ$. A nocturnal surface inversion does this --- so why does AP clutter appear and vanish overnight?}
+With the default ridge (0.9 km tall at 60 km range), solving $h_{\mathrm{ap}}(60\,\mathrm{km}, 0.9^\circ, dN/dh) = 0.9$ km gives $dN/dh\approx-181$ N/km --- solidly in the ducting regime. AP ground clutter appears and vanishes overnight because the strong, near-surface temperature/moisture inversions that produce such gradients are themselves diurnal: they build after sunset as the ground radiatively cools and a stable, shallow layer forms, and they erode after sunrise as daytime mixing destroys the inversion --- so the anomalous refraction (and the false echoes it produces) tracks the same day/night cycle.
+\end{qa}
+
+\tier{Going deeper}
+\begin{qa}{Define modified refractivity $M = N + 0.157h$ ($h$ in meters). Show that ``ducting'' becomes the clean criterion $dM/dh<0$, and that this is identical to $dN/dh<-157$ N/km. Confirm the slider's ducting onset matches this threshold exactly.}
+Differentiating, $dM/dh = dN/dh + 0.157$ (with $h$ in meters, so the constant is per meter; converting to per km multiplies by 1000, giving $+157$ N-units/km). Thus $dM/dh<0 \iff dN/dh < -157$ N/km. This matches the code's own ducting boundary (\texttt{dNdh <= -157}) exactly, and matches the constant-height derivation above ($R_e\to\infty$ at $dN/dh=-157.0$ N/km) to within rounding.
+\end{qa}
+\begin{qa}{For super-refraction the ground-strike range follows $r\approx-2R_e\sin\theta$. Using the small-angle approximation, predict that, at a fixed dN/dh, doubling the elevation should double the strike range. Test it on the widget at two elevations --- and find the elevation/gradient combination where the small-angle approximation visibly starts to break down.}
+At $dN/dh=-300$ ($R_e\approx-6991$ km), the formula predicts strike ranges of $122.0$ km at $0.5^\circ$ and $244.0$ km at $1.0^\circ$ --- numerically confirmed to better than $0.02\%$ (the widget shows $122.0$ km and $244.1$ km), exactly doubling as predicted. In fact, $r=-2R_e\sin\theta$ is not merely a small-angle approximation within this widget's own model --- it is the \emph{exact} algebraic root of $h_{\mathrm{ap}}=r\sin\theta + r^2/(2R_e)=0$ (factor out $r$ and solve the remaining linear term), so it holds to numerical precision even at large elevations (verified here through $12^\circ$). The only place a genuine approximation enters is one level up: $h_{\mathrm{ap}}$ itself is a paraxial simplification of the full spherical-Earth formula used elsewhere in the notebook (Widget 2's $h(r,\theta)=\sqrt{r^2+R_e^2+2rR_e\sin\theta}-R_e$). Comparing the two directly at standard refraction shows the paraxial formula stays within about $0.1$--$0.3\%$ of the exact one even out to $20^\circ$ elevation and 150 km range --- so for the elevations and ranges relevant to real AP events (which occur almost exclusively at the lowest one or two tilts, because ducting layers are only tens of meters thick), the approximation is effectively exact and does not meaningfully break down.
+\end{qa}
+\begin{qa}{With the ridge at 60 km (0.9 km tall), find the dN/dh at which the $0.9^\circ$ beam first grazes the ridge top it clears under standard refraction. Then explain why a single ducting night produces both AP ground clutter at long range and new terrain blockage on the same radar --- and why both vanish after the morning mixing.}
+This is the same calculation as the ``A little further'' question above: $dN/dh\approx-181$ N/km makes the $0.9^\circ$ beam just touch the 0.9 km ridge at 60 km, where under standard refraction ($-39$ N/km) that same beam clears the ridge comfortably ($h_{\mathrm{ap}}(60,0.9^\circ,-39)\approx1.15$ km). A single strong ducting layer does two things simultaneously because it changes the \emph{same} beam-height curve everywhere along the ray: near the radar and at low elevation it lets the beam curve down into terrain it normally clears (new, temporary blockage), while farther out, past where it would have cleared the horizon, the same downward-bent beam eventually curves into the ground, generating a long-range false echo (AP clutter). Both effects trace back to one shared cause --- the abnormally low effective Earth radius --- so both appear together when the inversion forms after sunset and both disappear together once daytime mixing destroys the inversion and restores the standard refractivity gradient.
+\end{qa}
+
+\subsection{Widget 4: The beam gets blocked (terrain)}
+
+\tier{Basic}
+\begin{qa}{With the default ridge, what is the peak cumulative blockage at $0.5^\circ$?}
+Approximately 74--75\% (numerically, $\mathrm{CBB}_{\max}\approx0.745$ for the default 0.9 km ridge centered at 60 km, at $0.5^\circ$ elevation with the default beamwidth) --- a substantial majority of the beam's power is lost at the ridge and downrange of it.
+\end{qa}
+\begin{qa}{Raise the elevation. At roughly what tilt does the blockage clear?}
+By about $1.2^\circ$ the peak cumulative blockage has fallen to essentially zero for the default ridge geometry --- the beam center has climbed enough that the full beam disc clears the ridge top.
+\end{qa}
+
+\tier{A little further}
+\begin{qa}{Why does the cumulative blockage stay high \emph{after} the ridge while the per-gate value drops back to zero? What does that mean for everything downrange of a blocked azimuth?}
+CBB is defined as the running \emph{maximum} of PBB out to the current gate, not the instantaneous value --- once the beam has lost, say, 74\% of its power crossing the ridge, that power is gone permanently; the beam does not ``refill'' once the terrain drops away, even though the per-gate PBB (which measures only the local geometric overlap) returns to zero past the ridge. Practically, this means every gate downrange of a blocked azimuth --- not just the blocked gate itself --- is sampling with a permanently reduced effective power, and any reflectivity or rainfall estimate along that entire radial beyond the obstruction is biased low unless explicitly corrected.
+\end{qa}
+\begin{qa}{Move the ridge closer to the radar at the same height. Does it block more or less --- and why (think about how high the beam is there)?}
+It blocks more. Closer to the radar the beam center is lower (Widget 2's height formula grows with range), so a ridge of the same physical height intercepts a larger fraction of the beam's cross-section --- the same obstacle height represents a bigger share of a beam that hasn't yet climbed very far.
+\end{qa}
+
+\tier{Going deeper}
+\begin{qa}{CBB is a fraction of power, so the remaining power is $(1-\mathrm{CBB})$ and the reflectivity bias is $10\log_{10}(1-\mathrm{CBB})$ dB. Using $Z=200R^{1.6}$, convert the default ridge's peak CBB into the percentage by which downrange rainfall is underestimated if you never correct it. Repeat for a 50\% block --- how much of the error is hidden in that ``only half-blocked'' gate?}
+With $\mathrm{CBB}_{\max}\approx0.745$: $\Delta Z \approx 10\log_{10}(0.255)\approx-5.9$ dB, and propagating through $Z=200R^{1.6}$ gives $R_{\mathrm{obs}}/R_{\mathrm{true}} = (1-\mathrm{CBB})^{1/1.6}\approx0.425$ --- rainfall is underestimated by roughly \textbf{57\%}. Even at only 50\% blockage, $\Delta Z\approx-3.0$ dB and $R_{\mathrm{obs}}/R_{\mathrm{true}}\approx0.648$, a $\sim$\textbf{35\%} underestimate --- so a gate that looks only ``half blocked'' is already hiding more than a third of the true rainfall, which is why operational networks correct (or discard) partially blocked gates rather than trusting them at face value.
+\end{qa}
+\begin{qa}{Predict and then confirm that PBB $\approx50\%$ exactly when the terrain top reaches the beam center height. Read the $0.5^\circ$ beam-center height at 60 km off Widget 2, set the ridge to that height, and check the PBB peak lands near 50\%.}
+Widget 2 gives $h(60\,\mathrm{km},0.5^\circ)\approx0.735$ km. Setting the ridge to that height (at 60 km) and evaluating PBB numerically gives a peak PBB $\approx53\%$ --- close to the predicted 50\%, as expected from the blockage geometry: when the terrain top exactly reaches the beam's center height, it is intercepting a disc symmetrically about its own centerline, blocking almost exactly half the beam's circular cross-sectional power (the small offset from an exact 50\% arises because the beam's power taper is Gaussian-like rather than a uniform disc, but the disc-overlap approximation used here still lands very close to the halfway point).
+\end{qa}
+\begin{qa}{Networks typically correct gates up to $\sim$70\% cumulative blockage and discard everything beyond. For the default ridge, find the lowest elevation tilt that keeps CBB under 70\% --- then quantify, using Widget 2, exactly how much higher in the atmosphere you're now forced to sample by choosing that tilt. Is the trade worth it?}
+The lowest tilt keeping CBB under 70\% for the default ridge is only about $0.55^\circ$ (versus the default $0.5^\circ$) --- because the default ridge (0.9 km at 60 km) is only mildly blocking at $0.5^\circ$ to begin with (peak CBB $\approx$74--75\%, just over the 70\% correction limit). The corresponding height increase at, say, 60 km is small (a few tens of meters, from Widget 2's height formula). For \emph{this particular} ridge, the trade is clearly worth it: a tiny elevation increase brings blockage safely under the correction threshold at negligible cost in coverage. The more general lesson --- illustrated by taller or closer ridges elsewhere in this widget --- is that the answer changes case by case: a much taller or closer obstruction can demand a far larger elevation increase, at which point the height cost (lost low-level coverage, Widget 2) can outweigh the benefit of clearing the blockage, and an operator must choose between a corrected-but-elevated view and a lower, partially-blocked one.
+\end{qa}
+
+\subsection{Widget 5: Radar data (KNKX 11 March 2006)}
+
+\tier{Basic}
+\begin{qa}{At the lowest tilt ($0.50^\circ$), find the thin radial ``spokes'' of missing or weakened echo running outward from the radar. Do they sit at the same azimuths as you step up through $1.40^\circ$, $3.00^\circ$, and $5.10^\circ$ --- and do they fill in or persist? Which idea from this block explains gaps that are anchored to fixed directions yet disappear as the beam climbs?}
+The spokes sit at fixed azimuths and fill in progressively as the tilt increases, disappearing well before the highest tilt. This is exactly the terrain-blockage idea (Widget 4): near-radar obstacles block only a narrow range of \emph{fixed} directions (hence the radial, spoke-like shape anchored to specific azimuths), and because the beam climbs with both range and elevation (Widgets 1--2), raising the tilt eventually lifts the beam clear of the obstruction, filling the gap back in.
+\end{qa}
+
+\tier{A little further}
+\begin{qa}{Why does raising the tilt fill the spokes back in? Using the beam-height widget, reason about where the beam goes at a blocked azimuth as the tilt increases relative to a near-radar obstacle --- and what that tells you about whether a spoke is blockage or real precipitation that simply isn't there.}
+Near a nearby obstacle, the beam height at a fixed short range grows directly with elevation angle (Widget 2's $h\approx r\sin\theta+r^2/2R_e$, dominated by the linear $r\sin\theta$ term at short range) --- so a small increase in tilt lifts the beam clear of a nearby ridge or building relatively quickly. The fact that a gap fills in smoothly as elevation increases, rather than persisting at every tilt, is itself the diagnostic: real precipitation absence would not systematically vanish as you simply look higher over the same spot, whereas a beam that is progressively climbing over a fixed obstacle is exactly the signature of blockage, not missing weather.
+\end{qa}
+
+\tier{Going deeper}
+\begin{qa}{Tie blockage to its cost. The lowest tilt that clears the obstacles also samples higher in the atmosphere --- using the beam-height widget, estimate how much higher you're sampling at $\sim$50 km when you go from $0.50^\circ$ to the tilt that fills the spokes, and what shallow low-level weather you'd miss there. For a spoke that is weakened but not absent (a partial block), explain why the reflectivity is biased low all the way downrange along that radial, and why a rainfall estimate there would read too low even far beyond the obstacle.}
+Using Widget 2's height formula at $r=50$ km: $h(50,0.5^\circ)\approx0.66$ km versus $h(50,1.4^\circ)\approx1.87$ km --- roughly 1.2 km higher at the tilt that clears most near-radar obstructions. Any shallow, low-level feature confined to the lowest kilometer or so above the surface --- a shallow stratiform rain layer, fog-top drizzle, or a low-level jet signature --- is missed entirely at the higher tilt, even though the blockage itself is fixed. For a partial block, the reasoning from Widget 4's cumulative-blockage discussion applies directly: CBB never decreases downrange of the obstruction, so the same fractional power loss persists at every gate beyond it, and the corresponding $10\log_{10}(1-\mathrm{CBB})$ dB bias (and the resulting rainfall underestimate through $Z=200R^{1.6}$) applies not just at the ridge but along the entire remainder of that radial.
+\end{qa}
+\clearpage
+\section{Block 2 --- One Measurement}
+
+\subsection{Widget 1: The pulse --- one slider, three consequences}
+
+\tier{Basic}
+\begin{qa}{With the two targets 400 m apart, are they resolved as two peaks at the short pulse (1.5 $\mu$s)? Lengthen the pulse until they merge into one --- what is $\Delta r$ there, compared to 400 m?}
+At 1.5 $\mu$s, $\Delta r = c\tau/2 \approx225$ m, which is smaller than the 400 m separation, so the two targets are resolved as distinct peaks. They merge once $\Delta r$ grows to roughly match the 400 m spacing, i.e.\ around $\tau\approx2.7\ \mu$s ($\Delta r=c\tau/2=400$ m $\Rightarrow \tau = 800/c \approx 2.67\ \mu$s) --- consistent with the rule that two equal targets separate cleanly only once their spacing exceeds $\Delta r$.
+\end{qa}
+\begin{qa}{Read the blind range near the radar at 1.5 $\mu$s and at 4.5 $\mu$s. Which pulse lets you see closer to the radar?}
+The blind range equals $\Delta r$: about 225 m at 1.5 $\mu$s and about 675 m at 4.5 $\mu$s. The shorter pulse (1.5 $\mu$s) lets the radar see closer in, since it finishes transmitting sooner and can start listening again sooner.
+\end{qa}
+
+\tier{A little further}
+\begin{qa}{By how many dB does sensitivity change going from 1.5 to 4.5 $\mu$s? Which pulse would you choose to hunt weak clear-air echo --- and what do you give up to get it?}
+Sensitivity scales with pulse energy, $10\log_{10}(\tau_2/\tau_1)=10\log_{10}(3)\approx4.77$ dB gained going from 1.5 to 4.5 $\mu$s. For weak clear-air echo (boundary-layer insects, dust, refractive turbulence) you would choose the long pulse for the extra sensitivity, at the cost of coarser range resolution (675 m vs.\ 225 m) and a much larger blind zone close to the radar.
+\end{qa}
+\begin{qa}{Two equal targets just separate when their spacing $\approx\Delta r$. Test this: find the merge separation at two different pulse lengths and check that it tracks $c\tau/2$.}
+At $\tau=1.5\ \mu$s, $\Delta r\approx225$ m; at $\tau=3.0\ \mu$s, $\Delta r\approx450$ m --- exactly double, tracking $c\tau/2$ linearly. Sliding the target separation to the point where two peaks just merge into one at each pulse length reproduces these same values, confirming the resolution rule directly.
+\end{qa}
+
+\tier{Going deeper}
+\begin{qa}{Sensitivity grows with pulse length while resolution $\Delta r=c\tau/2$ coarsens with it --- opposite directions. Set the pulse so $\Delta r\approx1$ km and read the sensitivity gain in dB over the 1.5 $\mu$s pulse. State the rule per doubling of $\tau$ for each (resolution and sensitivity), and explain why any single pulse length is a compromise.}
+$\Delta r\approx1$ km requires $\tau = 2\times1000/c \approx6.67\ \mu$s, giving a sensitivity gain of $10\log_{10}(6.67/1.5)\approx6.47$ dB over the 1.5 $\mu$s pulse. Per doubling of $\tau$: resolution coarsens by exactly a factor of 2 (linear in $\tau$), while sensitivity improves by a fixed $10\log_{10}(2)\approx3.01$ dB (logarithmic in $\tau$). Because both effects come from the very same knob and pull in opposite directions, there is no pulse length that is simultaneously ``the most sensitive'' and ``the finest resolution'' --- every choice of $\tau$ is a specific point on that trade-off, not a free improvement.
+\end{qa}
+\begin{qa}{At 4.5 $\mu$s the first $\sim$700 m are blind. A shallow boundary-layer is 500 m from the radar --- can a long-pulse clear-air scan see it at all? Why does clear-air mode accept such a large blind zone anyway?}
+No: at 500 m range, inside the $\sim$675 m blind zone of a 4.5 $\mu$s pulse, the radar is still transmitting and cannot listen for a return --- that feature is simply unobservable on this scan. Clear-air mode accepts this trade because its targets (insects, refractive index fluctuations, dust) are typically weak and diffuse but present over a broad volume extending well beyond the immediate vicinity of the radar; the priority is maximizing sensitivity to detect faint echo at moderate-to-long range, and the lost near-radar coverage is an acceptable (and usually supplemented by a separate short-pulse scan) price for that sensitivity.
+\end{qa}
+
+\subsection{Widget 2: The whole sample --- the resolution volume}
+
+\tier{Basic}
+\begin{qa}{How wide and tall is the sample at 60 km versus 230 km?}
+At the default beamwidth ($0.92^\circ$), the cross-beam width/height is $r\theta$: about 0.96 km at 60 km and about 3.68 km at 230 km.
+\end{qa}
+\begin{qa}{The radial depth stays $\sim$250 m at every range. Which slider changes it, and which one leaves it alone?}
+The \emph{pulse length} slider changes the depth ($\Delta r=c\tau/2$, at 1.5 $\mu$s giving $\approx225$ m, close to the stated $\sim$250 m); the \emph{range} slider leaves it alone, since $\Delta r$ depends only on the pulse, not on how far away the sample is.
+\end{qa}
+
+\tier{A little further}
+\begin{qa}{A convective core is $\sim$2 km across. Beyond what range does the beam grow wider than the core, so the peak reflectivity starts reading low (beam filling)?}
+Solving $r\theta=2$ km with $\theta=0.92^\circ$ gives $r\approx125$ km --- beyond that range the beam's cross-section exceeds the storm's own size, and the reported peak begins to be diluted by averaging in the weaker air surrounding the core (beam filling).
+\end{qa}
+\begin{qa}{Roughly how many km$^3$ of air does one pixel average at 150 km versus 230 km? Why does that matter for rainfall estimates and echo-top heights?}
+Using $V\approx(r\theta)^2\times(c\tau/2)$ at the default pulse (depth $\approx0.225$ km): at 150 km, width $\approx2.40$ km, giving $V\approx1.02$ km$^3$; at 230 km, width $\approx3.68$ km, giving $V\approx2.39$ km$^3$ --- more than double, from a range increase of only $\sim$53\%, because volume grows as $r^2$. This matters because both rainfall estimates and echo-top heights derived from these pixels are large-volume spatial averages: a small, intense core is smeared across an increasingly large volume with range, biasing peak rain-rate estimates low and biasing detected echo-top heights toward whatever fraction of the volume happens to contain the tallest scatterers, rather than the true, localized top.
+\end{qa}
+
+\tier{Going deeper}
+\begin{qa}{Both cross-beam dimensions grow with range, so the sample volume grows as $r^2$. Read the volume at 60 km and at 230 km and confirm the ratio matches $(230/60)^2$. What important consequence does this have for radar observations at long range?}
+$(230/60)^2\approx14.69$. Direct computation of $V(r)\propto r^2$ at the two ranges gives the same ratio to within rounding, confirming the $r^2$ scaling. The consequence is that a single reported value at long range represents an enormously larger spatial average than one at short range --- nearly 15 times more air is being blended into one number at 230 km than at 60 km --- so fine-scale structure (individual convective cells, sharp gradients) is progressively washed out purely by geometry, independent of any change in the storm itself.
+\end{qa}
+\begin{qa}{The beam's vertical extent is $r\theta$ and grows with range. A bright band is a $\sim$500 m thick layer. Find the range beyond which the beam's vertical extent exceeds 500 m, so the bright band can no longer be vertically resolved --- and explain why bright-band contamination is a sharp ring near the radar but a broad, smeared bias far out.}
+Solving $r\theta=0.5$ km gives $r\approx31$ km. Inside that range the beam is thinner than the bright band and can resolve it as a distinct, narrow ring of enhanced reflectivity at the melting-layer height; beyond it, the beam's vertical extent exceeds the layer's thickness, so the bright band's enhanced reflectivity gets blended together with the reflectivity above and below it in the same resolution volume, smearing what was a sharp ring into a broad, gradual positive bias in reported reflectivity (and hence rainfall) over a much wider range of the scan.
+\end{qa}
+
+\subsection{Widget 3: Can you even detect it? The radar equation}
+
+\tier{Basic}
+\begin{qa}{At NEXRAD defaults ($P_t=750$ kW, $D=8.5$ m, $f=2.8$ GHz, $\tau=1.5\ \mu$s), read the minimum detectable Z at 100 km. Now double the transmit power --- how many dBZ does it improve?}
+$Z_{\min}(100\,\mathrm{km})\approx-2.9$ dBZ at default power; doubling $P_t$ to 1500 kW improves this to $\approx-5.9$ dBZ, an improvement of $10\log_{10}(2)\approx3.0$ dB --- exactly the expected linear-in-power scaling of the radar equation.
+\end{qa}
+\begin{qa}{Put a $+10$ dBZ echo (light rain) at 450 km. Is it detected? Which single slider rescues it most easily?}
+At 450 km, $Z_{\min}\approx10.1$ dBZ --- a $+10$ dBZ echo sits right at (just below) the noise floor and is essentially \emph{not} reliably detected. Of the available sliders, lowering the frequency (moving toward S-band, i.e.\ decreasing GHz) or increasing pulse length are the most effective single levers: pulse length buys sensitivity linearly and directly, while a longer wavelength reduces $Z_{\min}$ through the strong $1/\lambda^4$ scaling built into the radar constant.
+\end{qa}
+
+\tier{A little further}
+\begin{qa}{Keep the dish at $D=8.5$ m and move from S-band (2.8 GHz) to X-band (9.4 GHz). How many dB does the minimum detectable Z change, and how does that match the $1/\lambda^4$ scaling?}
+$Z_{\min}(100\,\mathrm{km})$ moves from $\approx-2.9$ dBZ (S-band) to $\approx-24.0$ dBZ (X-band) at the same dish --- an improvement of about 21.0 dB in favor of X-band. This matches the predicted $1/\lambda^4$ scaling almost exactly: $10\log_{10}\!\big[(\lambda_S/\lambda_X)^4\big]\approx21.0$ dB, confirming that at fixed dish size the sensitivity advantage of the shorter wavelength is entirely attributable to the fourth-power wavelength dependence in the radar constant.
+\end{qa}
+\begin{qa}{Now shrink the dish \emph{as} you shorten the wavelength. Set the dish to 2 m at X-band (9.4 GHz) and read the minimum detectable Z at 100 km; compare it to NEXRAD's (8.5 m dish, S-band). Can a dish a quarter the size keep up with --- or even beat --- NEXRAD?}
+At $D=2$ m, X-band: $Z_{\min}(100\,\mathrm{km})\approx-11.4$ dBZ, still substantially more sensitive than NEXRAD's $\approx-2.9$ dBZ despite a dish barely a quarter of NEXRAD's diameter. This is exactly how a compact X-band radar (e.g.\ a mobile or gap-filler unit) stays competitively sensitive with a much smaller, cheaper antenna: the $1/\lambda^4$ intrinsic sensitivity advantage from the shorter wavelength more than compensates for the reduced gain of the smaller dish. The price for this, as the notebook flags, is attenuation --- the subject of Block 4.
+\end{qa}
+
+\tier{Going deeper}
+\begin{qa}{This curve (min-detectable-Z $\propto r^2$, i.e.\ $+6$ dB per range doubling) is the \emph{beam-filled} law. A point target instead falls off as $1/r^4$. Explain why distributed weather falls only as $r^2$ while a point target falls as $r^4$, and what does that mean for detecting weak distant rain?}
+A discrete point target (bird, aircraft) returns a fixed radar cross-section regardless of range, so its received power follows the ordinary two-way radar equation, $P_r\propto1/r^4$. Distributed weather, by contrast, fills the entire resolution volume, and that volume itself grows as $r^2$ (Widget 2) --- so as range increases, more scatterers are illuminated even as each one's individual return weakens, and the two effects partially cancel: received power from distributed weather falls only as $1/r^2$, and the corresponding minimum detectable $Z$ rises only as $r^2$ (gentler, in dB terms, than the point-target case). Practically, this means weak, distant, but spatially extended rain is considerably easier to detect than a comparably faint discrete target at the same range --- the r$^2$ falloff, not r$^4$, is the correct law governing how far a radar can usefully ``see'' weather.
+\end{qa}
+\begin{qa}{Combine all three of this block's ideas: lengthening the pulse raises sensitivity, coarsens resolution, and deepens the sample. Pick a pulse length that just detects 0 dBZ at 200 km, then state the resolution and sample-depth price you paid. Is that a good pulse for severe convection, or for clear-air mode?}
+Solving $Z_{\min}(200\,\mathrm{km})=0$ dBZ for $\tau$ gives $\tau\approx2.24\ \mu$s, for which $\Delta r=c\tau/2\approx336$ m (both the range resolution and the sample depth, since they are the same quantity). This is a modest resolution cost, not an extreme one --- reasonable for either mode, but the underlying trade-off is directionally clear: this pulse length is better suited to clear-air mode, where the priority is detecting faint, diffuse echo and a few hundred meters of extra blur is an acceptable cost; for severe convection, where fine-scale structure (tight reflectivity and velocity gradients across a tornadic core, for instance) is critical, a shorter pulse trading some sensitivity for sharper resolution is usually preferred.
+\end{qa}
+
+\subsection{Widget 4: Radar data --- one storm, two ranges}
+
+\tier{Basic}
+\begin{qa}{Which panel catches the faint, widespread echo around the storm, and which keeps only the strong cores? That contrast is the near radar versus the far one --- which is which, and why?}
+KTLX (the near radar, $\sim$20 km) catches the faint, widespread echo; KINX (the far radar, $\sim$200 km) keeps mainly the strong cores. This is Widget 3's sensitivity-vs-range relationship directly: KINX's minimum detectable $Z$ at its much greater range is far higher than KTLX's at short range, so weaker, more widespread echo that KTLX can still see simply falls below KINX's noise floor.
+\end{qa}
+\begin{qa}{Now the cores: one panel resolves tighter, finer structure; the other smears the same storm into coarser blobs. Which is the near radar, and which idea from this block explains the difference?}
+KTLX (near) resolves tighter, finer structure; KINX (far) smears the storm into coarser blobs. This is the beam-width/resolution-volume idea (Widget 2): at ten times the range, KINX's cross-beam resolution is roughly ten times coarser, so fine structure that KTLX's much smaller resolution volume can resolve is blended together in KINX's much larger one.
+\end{qa}
+
+\tier{A little further}
+\begin{qa}{From the radar-equation widget, the far radar is $\sim$10$\times$ the range, so its minimum detectable Z sits about $+20$ dB higher. Connect that number to the weak periphery that vanishes in the far panel --- roughly what echo strength drops below its noise floor?}
+$10\log_{10}(10^2)=20$ dB, matching $Z_{\min}\propto r^2$ exactly. If KTLX's noise floor at 20 km is on the order of $-20$ to $-25$ dBZ (typical for NEXRAD-class sensitivity at short range), KINX's floor at 200 km would sit around $0$ to $+5$ dBZ --- so weak echo in roughly that range (light drizzle, the outer fringes of the storm, weak clear-air return) that KTLX easily detects simply disappears below KINX's noise floor.
+\end{qa}
+\begin{qa}{The far radar's $0.48^\circ$ beam at 200 km is also $\sim$4 km up, so part of why its panel looks different is height, not resolution. Can beam height alone make an echo \emph{broader}? If not, what must the broadening be doing on its own?}
+No --- beam height by itself only changes \emph{which altitude} is being sampled, not the beam's angular width. The observed broadening (beam $\approx$0.3 km wide at KTLX/20 km versus $\approx$3.3 km wide at KINX/200 km) is entirely a resolution effect, driven by the $r\theta$ growth of the cross-beam dimension with range (Widget 2) --- the same physical mechanism regardless of what altitude is sampled.
+\end{qa}
+
+\tier{Going deeper}
+\begin{qa}{Remove the height confound (second image below). With both sampling about the same height ($\sim$4 km, KTLX at $\sim12.5^\circ$), does the far storm now look clearly broader and coarser? Note too that the near $12.48^\circ$ panel is a compact disc --- explain why a high tilt loses the storm with range.}
+Computing the height-matched elevation confirms the setup: KINX at $0.48^\circ$/200 km reaches $\approx4.03$ km, and the KTLX elevation reaching the same height at 20 km is $\approx11.6^\circ$ (matching the panel's stated $12.48^\circ$ closely). With height now held fixed, any remaining broadening/coarsening in the far panel is attributable to resolution alone, not altitude --- and yes, the storm should look visibly broader and coarser in the far panel under this comparison. The near, high-tilt ($12.48^\circ$) panel appears as a small, compact disc for a geometric reason unrelated to beamwidth: a steep tilt intersects the storm over only a short slant-range interval before climbing above its top, so only a small footprint of the storm falls within the beam's swept path at that elevation --- the storm is ``lost'' with increasing range on a high tilt simply because the beam quickly climbs above the storm's vertical extent as range increases (Widget 2's height-growth again), not because of any resolution effect.
+\end{qa}
+\begin{qa}{Estimate the sample-volume ratio: both cross-beam dimensions scale with range and the depth $c\tau/2\approx0.25$ km is shared, so volume $\propto r^2$. At $\sim$10$\times$ the range, one KINX pixel averages $\sim$100$\times$ more air --- what does smearing the storm across that much atmosphere do to its peak?}
+$(200/20)^2=100$, confirming the 100$\times$ volume-average claim directly. Averaging the storm's sharp, localized peak reflectivity across a volume roughly 100 times larger than KTLX's inevitably blends the intense core with the much larger volume of weaker surrounding air captured in the same gate --- this is beam filling at its most extreme, and it substantially and systematically underestimates the storm's true peak intensity as observed by the distant radar, even though both radars are viewing the identical, actual storm at the identical time.
+\end{qa}
+\clearpage
+\section{Block 3 --- Range, Velocity, and Ambiguity}
+
+\subsection{Widget 1: The pulse train sets the rules --- range folding}
+
+\tier{Basic}
+\begin{qa}{At 1000 Hz, what is the maximum unambiguous range? Send a target to 320 km --- where does it appear?}
+$r_{\max}=c/(2\cdot\mathrm{PRF})\approx149.9$ km at 1000 Hz. A true target at 320 km is displayed at $320\bmod149.9\approx20.2$ km --- a second-trip echo appearing far closer to the radar than it actually is.
+\end{qa}
+\begin{qa}{Lower the PRF. Does $r_{\max}$ grow or shrink?}
+It grows: $r_{\max}\propto1/\mathrm{PRF}$, so, for example, halving the PRF to 500 Hz doubles $r_{\max}$ to about 300 km. Pulses go out less often, giving each one more time to travel out and back before the next is transmitted.
+\end{qa}
+
+\tier{A little further}
+\begin{qa}{Choose one PRF that displays a storm at 300 km correctly and one that causes it to fold. For each case, record $r_{\max}$. What changed, and why did the displayed range suddenly jump?}
+A PRF of about 500 Hz or lower gives $r_{\max}\ge300$ km and displays the storm correctly at its true range. A PRF of, say, 1000 Hz gives $r_{\max}\approx150$ km, which is less than 300 km, so the echo folds and is displayed at $300\bmod150=0$ km (right at the radar). What changed is simply whether $r_{\max}$ exceeds the target's true range; the displayed range jumps discontinuously (from correct to badly wrong) the moment $r_{\max}$ drops below the true range, because the echo is now arriving after the following pulse has already gone out and is attributed to that later pulse instead.
+\end{qa}
+\begin{qa}{A second-trip echo shows up at (true range $-$ $r_{\max}$). Reason from the pulse timing why that's exactly where it lands.}
+The radar measures the elapsed time between transmitting a pulse and receiving an echo, and always assumes the echo belongs to the \emph{most recently transmitted} pulse. If the true two-way travel time exceeds one PRT, the echo actually arrives one PRT late --- after the next pulse has already been sent --- so the measured (too-short) travel time corresponds to $t_{\mathrm{true}}-\mathrm{PRT}$, which converts directly to a displayed range of $r_{\mathrm{true}} - c\cdot\mathrm{PRT}/2 = r_{\mathrm{true}} - r_{\max}$.
+\end{qa}
+
+\tier{Going deeper}
+\begin{qa}{Suppose a radar must monitor storms out to 400 km. Using the widget, determine the highest PRF that could be used without producing second-trip echoes from that range. Why does monitoring distant storms place a limit on how frequently the radar can transmit pulses?}
+Requiring $r_{\max}\ge400$ km means $\mathrm{PRF}\le c/(2\times400{,}000)\approx374.75$ Hz. Any higher PRF shortens $r_{\max}$ below 400 km and causes anything beyond it to fold. The limit exists because the radar can only ever attribute an echo unambiguously to its most recent pulse if that pulse's echo returns before the next one is sent --- transmitting more often necessarily shortens the time window available for a distant echo to return, directly capping the achievable unambiguous range.
+\end{qa}
+\begin{qa}{Two storms are located at 80 km and 230 km. Adjust the PRF until the distant storm folds onto the same displayed range as the nearer storm. What would the radar display show, and why does this create an interpretation problem for forecasters?}
+Choosing $r_{\max}=230-80=150$ km (i.e.\ $\mathrm{PRF}=c/(2\times150{,}000)\approx999.3$ Hz) makes the 230 km storm fold exactly onto the same displayed range (80 km) as the genuinely nearby storm. The display would show what looks like a single echo at 80 km, when in fact it is a superposition of two physically distinct storms at very different true ranges. This creates a serious interpretation problem: a forecaster cannot tell from the display alone whether they are looking at one storm, or two unrelated storms whose signals have been folded on top of each other --- intensity, movement, and even hazard assessment for the near storm could be badly corrupted by contamination from the far one.
+\end{qa}
+\begin{qa}{Range folding changes more than an echo's location. Because the radar does not know the true distance to a second-trip echo, it computes Z using the displayed range. Would you expect the reported reflectivity to be too high, too low, or correct? Explain.}
+Too high. The radar-equation power-to-$Z$ conversion corrects for the expected $1/r^2$ falloff in received power using the \emph{assumed} (displayed, too-short) range. Since the echo actually traveled from a much greater true range and therefore arrived weaker than a genuine target at the displayed range would, the calibration overcompensates for a falloff smaller than what actually occurred, and the reported reflectivity comes out systematically biased high.
+\end{qa}
+
+\subsection{Widget 2: The trade you can't escape --- the Doppler dilemma}
+
+\tier{Basic}
+\begin{qa}{Slide the PRF. Does the operating point ever leave the curve?}
+No --- for a fixed wavelength (fixed band), every PRF places the radar at a different point along the same fixed curve $r_{\max}v_{\mathrm{Nyq}}=c\lambda/8$; only changing wavelength (switching bands) moves to a different curve.
+\end{qa}
+\begin{qa}{Read $r_{\max}$ and $v_{\max}$ at 1000 Hz and multiply them. Does the product change as you slide?}
+At 1000 Hz (S-band), $r_{\max}\approx149.9$ km and $v_{\mathrm{Nyq}}\approx26.77$ m/s, giving a product $\approx4012$ km$\cdot$m/s. This product stays constant (equal to $c\lambda/8$) no matter what PRF is chosen --- it depends only on wavelength.
+\end{qa}
+
+\tier{A little further}
+\begin{qa}{Can you reach the marked storm (35 m/s at 150 km) at \emph{any} single PRF? Why not, and by roughly what factor are you short?}
+No single PRF can reach it: the required product is $150\times35=5250$ km$\cdot$m/s, while the fixed S-band ceiling is $c\lambda/8\approx4013$ km$\cdot$m/s --- short by a factor of about 1.31. Since a single PRF is confined to the fixed curve $r_{\max}v_{\mathrm{Nyq}}=c\lambda/8$, any point that requires a larger product than that ceiling is simply unreachable, regardless of which PRF is chosen.
+\end{qa}
+\begin{qa}{Switch to C-band. Does the dilemma get easier or harder, and by about what factor? (Think $c\lambda/8$.)}
+Harder, by a factor of about 2: C-band's wavelength is roughly half of S-band's, so the ceiling $c\lambda/8$ is also roughly halved (S-band $\approx4013$, C-band $\approx2006$ km$\cdot$m/s). The same 35 m/s-at-150-km target that was already unreachable at S-band is now more than twice as far out of reach at C-band.
+\end{qa}
+
+\tier{Going deeper}
+\begin{qa}{The product $r_{\max}v_{\max}=c\lambda/8$ is fixed by wavelength. Read it for S-band and C-band off the widget and confirm the ratio matches $\lambda_S/\lambda_C$. For C-band networks, does the shorter wavelength make the dilemma better or worse, and by how much?}
+$c\lambda/8\approx4013$ km$\cdot$m/s (S) and $\approx2006$ km$\cdot$m/s (C); the ratio is exactly 2.0, matching $\lambda_S/\lambda_C=2.0$ precisely (since the constant scales linearly with $\lambda$). For C-band networks the shorter wavelength makes the range--velocity trade-off strictly \emph{worse}, by exactly this factor of 2 --- for any chosen PRF, C-band delivers only half the achievable $r_{\max}\cdot v_{\mathrm{Nyq}}$ product that S-band would at the same PRF.
+\end{qa}
+\begin{qa}{Make it concrete with a typical 3:2 dual-PRF pair, 1200 Hz and 800 Hz. Read $v_1$ at 1200 Hz and $v_2$ at 800 Hz, and $r_{\max}$ at each. Compute $v_{\mathrm{ext}}=v_1v_2/(v_1-v_2)$. Compare to the single-PRF curve, and check whether dual-PRF lands \emph{on} the curve $r_{\max}v_{\max}=c\lambda/8$ or beyond it --- and whether it finally brings the 35 m/s @ 150 km storm within reach.}
+At S-band: $v_1=v_{\mathrm{Nyq}}(1200\,\mathrm{Hz})\approx32.12$ m/s, $r_1\approx124.9$ km; $v_2=v_{\mathrm{Nyq}}(800\,\mathrm{Hz})\approx21.41$ m/s, $r_2\approx187.4$ km. The extended Nyquist velocity is $v_{\mathrm{ext}}=v_1v_2/(v_1-v_2)\approx64.2$ m/s. Retaining the longer unambiguous range of the two ($r_2\approx187.4$ km, from the lower PRF), the operating point $(187.4\ \mathrm{km},\,64.2\ \mathrm{m/s})$ has a product of $\approx12{,}038$ km$\cdot$m/s --- roughly \textbf{3 times} the single-PRF S-band ceiling of $\approx4013$ km$\cdot$m/s. Dual-PRF therefore lands well \emph{beyond} the single-PRF curve, not merely on it: it is a genuinely different operating regime that a single PRF could never reach (the single PRF needed to give $v_{\mathrm{Nyq}}=64.2$ m/s outright would only manage $r_{\max}\approx62.5$ km, a much worse range than dual-PRF achieves). And yes --- with $v_{\mathrm{ext}}\approx64.2$ m/s $>35$ m/s and $r_2\approx187.4$ km $>150$ km, the marked storm is now comfortably within reach.
+\end{qa}
+
+\subsection{Widget 3: The artifact you'll actually see --- velocity aliasing}
+
+\tier{Basic}
+\begin{qa}{At 1000 Hz, what is the Nyquist velocity? Set a 35 m/s storm --- what velocity is displayed?}
+$v_{\mathrm{Nyq}}(1000\,\mathrm{Hz})\approx26.77$ m/s at S-band. A true velocity of 35 m/s exceeds this and folds to a displayed value of about $-18.5$ m/s --- not merely a wrong magnitude, but the wrong sign as well (apparently inbound when actually outbound).
+\end{qa}
+\begin{qa}{Raise the PRF until 35 m/s is no longer aliased. What range did you give up (recall Widget 1)?}
+Requiring $v_{\mathrm{Nyq}}\ge35$ m/s needs $\mathrm{PRF}\ge35\times4/\lambda\approx1308$ Hz, at which $r_{\max}\approx114.6$ km --- down from the $\approx149.9$ km available at 1000 Hz. Roughly 35 km of unambiguous range coverage was given up to remove the aliasing.
+\end{qa}
+
+\tier{A little further}
+\begin{qa}{A display shows a sudden jump from $+25$ to $-25$ m/s across a smooth gradient. Real wind shear, or aliasing? Use the widget to make the argument.}
+This pattern --- an abrupt, near-symmetric sign flip ($+25\to-25$) right across an otherwise smooth field --- is the textbook signature of velocity aliasing rather than genuine wind shear. On the widget, a true velocity crossing $+v_{\mathrm{Nyq}}$ produces exactly this kind of instantaneous fold to the opposite sign of comparable magnitude near the Nyquist limit, whereas a real shear line typically produces a more gradual, physically continuous transition in speed and direction rather than an instant jump to a near-mirror-image value.
+\end{qa}
+\begin{qa}{A 3:2 dual-PRF scheme using 1200 and 800 Hz can extend the effective Nyquist velocity to about 64 m/s while retaining the lower PRF's range coverage. Would this allow a 35 m/s storm at 150 km to be measured without ambiguity? Explain using the widget.}
+Yes. With $v_{\mathrm{ext}}\approx64.2$ m/s (well above 35 m/s) and the retained unambiguous range $r_2\approx187.4$ km (above 150 km), both the velocity and the range requirements are comfortably satisfied simultaneously --- exactly the scenario worked out quantitatively in Widget 2's Going Deeper question, where dual-PRF was shown to move the radar off the single-PRF trade-off curve entirely.
+\end{qa}
+
+\tier{Going deeper}
+\begin{qa}{A storm with a true radial velocity of $+40$ m/s is observed with a Nyquist velocity of 28 m/s. What velocity would the radar display? Show how velocity dealiasing recovers the true value.}
+Folding $+40$ m/s into a $\pm28$ m/s window gives a displayed velocity of $-16$ m/s. Dealiasing recovers the true value by adding whole multiples of $2v_{\mathrm{Nyq}}=56$ m/s to the displayed value until it matches a physically reasonable velocity given neighboring gates: $-16 + 56 = +40$ m/s, recovering the true velocity exactly.
+\end{qa}
+\begin{qa}{Dealiasing recovers the true velocity by adding whole multiples of $2v_{\mathrm{Nyq}}$, using continuity with neighboring gates to decide how many. On the widget, set a storm fast enough to fold, and describe how a neighbour-continuity rule would unfold it. Then argue where it breaks down: if an \emph{entire} region exceeds the Nyquist --- not just an isolated core --- why does the algorithm lose its reference?}
+For an isolated fast core surrounded by slower, unambiguous gates, a neighbor-continuity algorithm scans outward from the reliable surrounding gates and, at the point where the displayed velocity jumps abruptly by roughly $2v_{\mathrm{Nyq}}$, adds (or subtracts) that same $2v_{\mathrm{Nyq}}$ to bring the folded core back into a smooth, physically continuous velocity field consistent with its neighbors. This breaks down when an entire contiguous region --- not just one isolated patch --- exceeds the Nyquist velocity: in that case there are no nearby unambiguous gates left anywhere in the vicinity to anchor the continuity assumption, so the algorithm has no reliable reference velocity to compare against and cannot determine how many multiples of $2v_{\mathrm{Nyq}}$ to add; the entire region can be dealiased incorrectly (or not at all), and this is precisely the situation that arises in intense, widespread wind fields such as major hurricanes (Widget 4).
+\end{qa}
+
+\subsection{Widget 4: Radar data --- a hurricane's velocity field}
+
+\tier{Basic}
+\begin{qa}{The velocity panel divides into a large region moving away from the radar (red) and one moving toward it (green), split by a near-zero band curving through the storm. Which side is the wind blowing away, and which toward?}
+By the notebook's own color convention, red indicates outbound (away from the radar) and green indicates inbound (toward the radar); the two regions are separated by the near-zero isodop that curves through the circulation center, consistent with a rotating vortex whose tangential flow is toward the radar on one side and away on the other.
+\end{qa}
+\begin{qa}{Knowing one side is inbound and the other outbound, where on the panel would you look for the strongest winds --- and does the picture match a storm rotating around a center?}
+The strongest winds appear where the inbound and outbound maxima sit closest together, straddling the circulation center --- typically just off to either side of the near-zero isodop, at the radius of maximum wind. Yes, this pattern (a coherent couplet of inbound and outbound maxima arranged symmetrically about a common center) is exactly the velocity signature of a rotating vortex.
+\end{qa}
+
+\tier{A little further}
+\begin{qa}{Scan the velocity field for places where the colors change abruptly despite the broader flow remaining smooth. Do any of those patches look more like velocity aliasing than a real wind reversal? Explain your reasoning.}
+Yes --- any small, sharply-bounded patch where the color jumps abruptly to a value near the opposite extreme of the color scale, embedded within an otherwise smoothly-varying flow, is the signature of velocity aliasing (Widget 3) rather than a genuine, spatially coherent wind reversal; a real reversal would be expected to develop gradually across a broader region tied to the storm's actual dynamics, not appear as an isolated speckle against a smooth background.
+\end{qa}
+\begin{qa}{The widget showed that aliasing happens once the wind exceeds the Nyquist velocity. So an aliased patch tells you something concrete about the wind there --- what?}
+It tells you the true wind speed at that location exceeds the radar's Nyquist velocity for the PRF in use --- i.e.\ it is a lower bound on how strong the actual wind is there, even before dealiasing recovers the exact value; an aliased patch is direct (if initially ambiguous) evidence of an unusually intense wind maximum, which is exactly why aliasing is common in the eyewall region of intense hurricanes.
+\end{qa}
+
+\tier{Going deeper}
+\begin{qa}{Estimate the radius of the velocity coverage. Reflectivity extends well beyond this boundary. Why can the radar detect precipitation at those greater ranges while Doppler velocity measurements stop much closer to the radar?}
+Reflectivity and Doppler velocity are extracted from the same received signal but require very different amounts of signal-to-noise to estimate reliably: reflectivity only needs enough power above the noise floor to detect an echo at all, whereas a stable, low-variance velocity estimate needs a substantially higher SNR to resolve the pulse-to-pulse phase shifts precisely. Consequently, velocity estimates become unreliable (and are typically flagged as missing) at a shorter range than where reflectivity is still usable, even though both are measured by the same radar on the same scan --- velocity coverage effectively stops wherever SNR drops below the (higher) threshold velocity estimation requires, well before reflectivity's (lower) detection threshold is reached.
+\end{qa}
+\begin{qa}{Imagine you are operating the radar during this hurricane. Your choices are: PRF A: little aliasing but velocity coverage only to 120 km, or PRF B: velocity coverage to 240 km but substantial aliasing. Which would provide more useful information for this storm, and why? What important information would be lost with the alternative choice?}
+For a hurricane, PRF B (wider range coverage, more aliasing) is generally the more useful operational choice: aliasing, while a nuisance, is a recoverable artifact via dealiasing algorithms (at least outside regions where the entire area exceeds the Nyquist velocity), whereas a hard 120 km coverage cutoff means the storm's outer wind field, rainbands, and approach/exit structure beyond that range are simply never measured at all --- information that cannot be recovered by any amount of post-processing. The trade-off is not risk-free, however: with PRF B, if the core of extreme winds (the eyewall, potentially exceeding the Nyquist velocity over a wide contiguous area) cannot be reliably dealiased, exactly that critical, most hazardous information could be lost or rendered ambiguous --- which is why operational hurricane-monitoring radars often use dual-PRF or specialized scanning strategies (Widget 2's dual-PRF solution) specifically to avoid having to make this trade-off at all.
+\end{qa}
+\clearpage
+\section{Block 4 --- Wavelength, Weather, and the Scan}
+
+\subsection{Widget 1: Shorter wavelength, bigger price --- attenuation}
+
+\tier{Basic}
+\begin{qa}{Which band reads the cell peak closest to the truth? Which loses everything behind the core?}
+S-band reads the peak closest to the truth (two-way loss $\approx0.27$ dB across the whole 120 km path at 80 mm/h --- essentially negligible). X-band loses the most: at the same rain rate, its two-way loss reaches roughly 82 dB across the full path, easily enough to extinguish the echo entirely behind the core.
+\end{qa}
+\begin{qa}{At 80 mm/h, roughly how many dBZ does the C-band echo lose behind the cell?}
+Roughly \textbf{16--17 dB} of two-way loss accumulates by the far edge of the cell at 80 mm/h --- real and operationally significant, though far short of X-band's much larger loss at the same rain rate.
+\end{qa}
+
+\tier{A little further}
+\begin{qa}{Compare the C-band profile with the S-band and X-band profiles as you increase the rain rate. Does C-band behave more like S-band or more like X-band? How does that change in heavy rain?}
+In this simplified model, attenuation scales linearly with rain rate for every band ($k=aR^b$ with $b=1$ for S, C, and X), so the \emph{relative} proportions among bands stay fixed at every rain rate: C-band's loss is consistently about 60 times S-band's and about one-fifth of X-band's, at any rain rate. What changes with increasing rain is the \emph{absolute} magnitude: at light rain, C-band's loss, while already non-negligible, is small enough in absolute terms to resemble S-band's ``don't worry about it'' regime; by heavy rain (80--150 mm/h), C-band's loss climbs into the tens of dB, a magnitude that only X-band reaches at comparatively light rain rates in this model --- so operationally, C-band shifts from behaving like a scaled-down S-band at light rain toward behaving like a genuine attenuation problem (X-band's regime, just less severe) once rain gets heavy.
+\end{qa}
+\begin{qa}{Raise the peak rain rate. Does the X-band shadow grow roughly in proportion to rain rate, or faster than proportionally? What does this imply about observing intense convective storms at X-band?}
+In proportion: because $b=1.0$ for X-band in this model, doubling the rain rate exactly doubles the two-way loss (verified numerically: 10, 40, 80, and 150 mm/h give losses of roughly 23, 48, 82, and 142 dB respectively --- essentially linear in $R$). Even a strictly linear relationship implies severe consequences for intense convection: because the \emph{absolute} loss at X-band is already large even at moderate rain rates, the most intense parts of a storm --- exactly where accurate reflectivity matters most for hazard assessment --- are also where X-band attenuation is most severe, so intense convective cores are the hardest, not the easiest, targets for a standalone X-band radar to see through.
+\end{qa}
+
+\tier{Going deeper}
+\begin{qa}{Two-way attenuation is a path integral --- the loss behind a cell depends on everything the beam has already crossed. Building on the faster-than-linear growth you found above, explain why the loss accumulates along the entire path, and why a second storm sitting behind a strong X-band-attenuating cell can become nearly invisible --- its echo extinguished in transit.}
+(Building on the linear-in-rain-rate growth established above.) Attenuation is defined as a path integral, $\mathrm{PIA}(x)=2\int_0^x aR(x')^b\,dx'$, which by construction accumulates monotonically along the beam --- every additional kilometer of rain the wave crosses adds more loss on top of what has already accrued, regardless of how far downrange the beam has traveled. For a strongly attenuating X-band beam crossing a heavy cell, the cumulative loss by the far edge of that cell can reach tens of dB (as computed above); any second storm positioned behind that cell must be illuminated by, and must return its echo through, that same already-depleted beam. If the accumulated two-way loss exceeds the available dynamic range/sensitivity margin of the radar, the second storm's echo is attenuated below the noise floor before it ever reaches the receiver --- effectively extinguished in transit, with no indication in the data that anything is even present there.
+\end{qa}
+\begin{qa}{At S-band, attenuation is usually negligible, which is why NEXRAD rarely requires attenuation correction. At C-band, attenuation can be significant. Read the two-way C-band loss across a heavy cell off the widget, and convert it to the rainfall underestimate downrange (use $Z=200R^{1.6}$).}
+At 80 mm/h peak rain, the two-way C-band loss across the full cell is $\approx16.5$ dB. Converting through $Z=200R^{1.6}$: $R_{\mathrm{obs}}/R_{\mathrm{true}} = 10^{(-16.5/10)/1.6} \approx0.19$ --- an underestimate of roughly \textbf{80\%} in rainfall downrange of the cell if the attenuation is left uncorrected. This is a dramatic bias, and is exactly why operational C-band networks apply attenuation correction schemes (often using $K_{DP}$, Block 5) rather than relying on raw reflectivity alone.
+\end{qa}
+
+\subsection{Widget 2: Sensitivity vs.\ attenuation --- which band sees the distant storm?}
+
+\tier{Basic}
+\begin{qa}{Set the rain to 0. Which band detects the weakest echoes at every range, and why (think $1/\lambda^4$ at the same dish)?}
+X-band, by a wide margin: with no intervening rain to attenuate the signal, only the intrinsic $1/\lambda^4$ sensitivity advantage matters, and X-band's much shorter wavelength gives it the lowest minimum detectable $Z$ at every range (e.g.\ $\approx-24.0$ dBZ vs.\ S-band's $\approx-2.9$ dBZ at 100 km, at the same dish size).
+\end{qa}
+\begin{qa}{Now raise the rain. Which band's curve climbs fastest, and which barely moves?}
+X-band's effective detectability curve climbs fastest (its attenuation coefficient $a=0.03$ is by far the largest of the three); S-band's barely moves at all ($a=0.0001$, essentially flat even at substantial rain rates).
+\end{qa}
+
+\tier{A little further}
+\begin{qa}{At a moderate rain rate, read the range where the X-band curve crosses the S-band curve. Inside it, which band is better; beyond it, which? Put the competition in one sentence.}
+At a moderate path rain rate of 5 mm/h, the X-band and S-band effective-detectability curves cross at approximately 70 km. Inside that range, X-band's intrinsic sensitivity advantage still dominates and it is the better choice; beyond it, the accumulating attenuation penalty has overtaken that advantage and S-band becomes the better choice. In one sentence: X-band wins close in in light-to-moderate rain, but loses to S-band beyond a rain-dependent crossover range because its attenuation penalty, growing with distance, eventually erases its fixed head-start in raw sensitivity.
+\end{qa}
+\begin{qa}{Push the rain rate higher. Does the crossover move toward or away from the radar? Why does heavier rain shrink X-band's useful sensitivity range?}
+Toward the radar: at 10 mm/h path rain the crossover moves in to roughly 35 km (versus $\approx$70 km at 5 mm/h). Heavier rain increases the attenuation penalty at every range (the $2aR^br$ term grows with $R$), so the point at which accumulated attenuation overtakes X-band's fixed intrinsic sensitivity advantage is reached sooner --- shrinking the range over which X-band remains the more sensitive choice.
+\end{qa}
+
+\tier{Going deeper}
+\begin{qa}{The intrinsic advantage (dotted) is a fixed $\sim$21 dB for X over S at the same dish --- the same at every range --- while the attenuation penalty grows \emph{with} range. Explain why a fixed head-start always loses to a penalty that accumulates, so for distant weak rain the longer wavelength wins eventually no matter how big the head-start.}
+The intrinsic sensitivity advantage is a constant offset (independent of range, since it comes purely from the fixed ratio $(\lambda_S/\lambda_X)^4$), while the attenuation penalty is a path integral that grows without bound as range increases (more rain crossed, more loss accumulated). Any constant, no matter how large, will eventually be exceeded by any quantity that grows monotonically and without limit as a function of the same variable (range) --- it is simply a matter of range being large enough. Therefore, for a sufficiently distant target through intervening rain, the accumulating attenuation penalty inevitably overtakes even a very large fixed head-start, and the longer wavelength (with negligible attenuation) eventually wins regardless of how much more intrinsically sensitive the shorter wavelength started out being.
+\end{qa}
+\begin{qa}{Tie it to widget 1: a compact C-band radar is more sensitive than NEXRAD at the same dish, yet it sees \emph{less} of a distant storm through heavy rain. For a network choosing a band, what does this trade say --- and what kind of technology, beyond making the radar more sensitive, would be needed to claw back the attenuated signal?}
+This is precisely the sensitivity-vs-attenuation competition worked out in this widget: C-band's intrinsic $1/\lambda^4$ advantage over S-band is real and helps at short range and in light rain, but its larger attenuation coefficient (0.006 vs.\ S-band's 0.0001) means that same advantage is erased, and then reversed, once enough rain lies along the path. A network choosing between bands is therefore not choosing ``more sensitive is always better'' --- it is choosing a specific point on a trade-off between raw sensitivity and resilience to attenuation, appropriate to its typical range of interest and climatology (how much heavy rain a beam is likely to cross). Making the radar itself more sensitive (more power, bigger dish, longer pulse) cannot fix attenuation, because attenuation is a loss the wave has already suffered before returning --- no amount of additional gain on transmit or receive can recover energy that was absorbed or scattered out of the beam in transit. What is needed instead is a fundamentally different kind of information that survives attenuation: exactly the role that dual-polarization phase measurements ($\Phi_{DP}/K_{DP}$, Block 5) play, since they measure a quantity attenuation does not corrupt.
+\end{qa}
+
+\subsection{Widget 3: Putting it together --- scan strategies}
+
+\tier{Basic}
+\begin{qa}{Read the volume update time for VCP 21 and VCP 12 at 3 rpm. Which is faster, and why?}
+At 3 rpm, VCP 21 (9 tilts) completes a full volume in $9\times20=180$ s (3.0 min); VCP 12 (14 tilts) takes $14\times20=280$ s (4.67 min). VCP 21 is faster simply because it has fewer tilts to scan through --- each additional tilt adds a fixed amount of time at a given rotation rate.
+\end{qa}
+\begin{qa}{For VCP 31, find the cone of silence: at 50 km range, how high can a storm top be before it sits above the top tilt and is missed?}
+VCP 31's top tilt is $4.5^\circ$; at 50 km, that beam's center height is $\approx4.07$ km. A storm top above roughly that height at 50 km range sits above the highest sampled beam and would be missed by this VCP (the ``cone of silence'').
+\end{qa}
+
+\tier{A little further}
+\begin{qa}{Choose a pattern that updates in under 3 minutes at 3 rpm. How many tilts can you afford, and what vertical coverage do you sacrifice?}
+At 3 rpm, each tilt costs 20 s, so staying under 180 s (3 min) allows at most 9 tilts --- exactly VCP 21, or the shorter ``fast low-level'' (3-tilt) and ``clear-air'' (5-tilt) patterns. Choosing VCP 21 over VCP 12 (14 tilts) sacrifices the denser vertical sampling VCP 12 provides between its lower tilts, which improves vertical structure resolution (e.g.\ for detecting shallow features or resolving storm-top detail) at the cost of the extra scan time VCP 21 doesn't have.
+\end{qa}
+\begin{qa}{Suppose the radar collects 50\% more pulses at every tilt to improve data quality. How does that change the VCP 12 volume update time? What benefits were gained, what was lost?}
+Collecting 50\% more pulses per tilt means each tilt takes 50\% longer to complete, so VCP 12's volume time grows from 280 s to $280\times1.5=420$ s (7.0 min) at the same 3 rpm. The benefit gained is improved data quality --- more pulses per estimate reduces the statistical variance of reflectivity, velocity, and (for dual-pol) $Z_{DR}$/$\rho_{hv}$/$\Phi_{DP}$ estimates, and can extend the usable Nyquist velocity range through longer dwell times. What is lost is update speed: nearly 2.5 extra minutes between complete volumes is a meaningful cost for rapidly evolving severe weather, where storm structure can change significantly between successive scans.
+\end{qa}
+
+\tier{Going deeper}
+\begin{qa}{You are scanning a fast-moving squall line. Design a VCP using the available patterns and rotation rates. Justify your choices in terms of (a) update time, (b) vertical coverage, and (c) the quality of measurements. What important information are you accepting that the radar may miss?}
+A fast-moving squall line is best served by prioritizing update speed and low-level structure over deep vertical coverage: the ``fast low-level (3 tilts)'' pattern at a high rotation rate (e.g.\ 6 rpm) gives a volume time of only $3\times10=30$ s, allowing the radar to track rapid evolution of the leading edge, gust front, and any embedded bow-echo or mesovortex structure at high temporal frequency. (a) Update time is minimized, which is the top priority for a fast-evolving, linear system. (b) Vertical coverage is deliberately sacrificed: with only 3 low tilts (0.5--2.5$^\circ$), the cone of silence begins at a comparatively low altitude, and storm-top/anvil structure well above the low tilts is not sampled at all. (c) Measurement quality (fewer pulses per tilt at high rpm) is also somewhat reduced relative to a slower scan, trading some estimate precision for speed. What is accepted as lost is exactly the deep vertical structure a VCP like VCP 12 would provide --- echo-top heights, mid-level rotation aloft, or overshooting tops associated with embedded severe cells within the line would be poorly sampled or entirely missed under this fast, low-level-focused strategy.
+\end{qa}
+\begin{qa}{A storm reaches 12 km in height near the radar. Using the top tilt of the selected VCP, determine the region in which the storm top would lie above the highest beam. How large is this unsampled volume, and what changes to the scanning strategy could reduce it?}
+Using VCP 21 (top tilt $19.5^\circ$): the beam reaches 12 km height at a range where $h(r,19.5^\circ)=12$ km, which (solving numerically) occurs at a comparatively short range --- inside that range, the highest tilt's beam is already above 12 km and the full storm top is captured; beyond that range, the top tilt's beam center is below 12 km and the upper portion of a 12 km-tall storm sits inside the cone of silence, unsampled. The unsampled region is a genuine three-dimensional volume --- a cone-shaped gap above the highest beam, widening with range --- and it grows larger the farther the storm is from the radar. Reducing it requires either adding tilts above the current top (extending vertical coverage at the cost of a longer volume time, per the earlier trade-off) or accepting the coverage gap as an inherent limitation of finite scan time and relying on a different, taller-topped VCP (or a nearby second radar) specifically when a storm of this height is anticipated within range.
+\end{qa}
+
+\subsection{Widget 4: Radar data --- the wavelength trade, both ways}
+
+\tier{Basic}
+\begin{qa}{Heavy-core pair: behind the strongest core, find where the C-band echo is weaker than the S-band. If both radars are calibrated and looking at the same storm, why do they report different reflectivities here? Note that C-band loses \emph{even though} it's the more powerful radar with the finer beam.}
+Behind the heaviest part of the core, the C-band panel reads systematically weaker than the S-band panel at the same location. Because both radars are properly calibrated and are observing the identical storm at the identical time, the discrepancy cannot be attributed to hardware error --- it is attenuation: the C-band beam has lost real energy crossing the heavy core ahead of that point, a physical loss that no amount of extra transmit power or a finer beam can undo, since attenuation happens to the wave itself before the reflectivity is even computed.
+\end{qa}
+\begin{qa}{Light-echo pair: which radar fills in the faint, widespread echo, and which breaks it into sparse speckle? Can we attribute this improvement just to the wavelength?}
+The C-band radar fills in the faint, widespread echo more completely; the S-band radar's rendering breaks it into sparser speckle. No, this particular pair cannot cleanly attribute the improvement to wavelength alone: as the notebook itself notes, the C-band radar in this comparison also runs a finer beam (0.5$^\circ$ vs.\ 1$^\circ$) and more transmit power (1 MW vs.\ 500 kW), so all three factors --- wavelength, beamwidth, and power --- are pushing sensitivity the same direction simultaneously, and this image pair alone cannot separate how much of the improvement is due to each.
+\end{qa}
+
+\tier{A little further}
+\begin{qa}{The detectability widget isolated wavelength by fixing the dish, and sensitivity went as $1/\lambda^4$. These two radars differ in power, beamwidth, AND wavelength at once. With the beamwidth given, the radar-equation sensitivity is received power $\propto P_t/(\theta^2\lambda^2)$ --- so more power, a finer beam, and a shorter wavelength all push it the same way. Can this pair, on its own, isolate how much of C-band's advantage is the wavelength?}
+No. Because $P_t$, $\theta$, and $\lambda$ all differ simultaneously between the two radars in this real-world pair, and all three enter the sensitivity expression $P_r\propto P_t/(\theta^2\lambda^2)$ in the same direction (all favoring C-band here), there is no way to attribute the observed sensitivity difference to any one factor using this image pair alone --- doing so requires the controlled, fixed-dish comparison of Widget 2, where beamwidth and wavelength are linked through a single, known dish size and power is held constant.
+\end{qa}
+\begin{qa}{Estimate the C-band deficit behind the core (compare the dBZ category on each at the same spot). Explain whether the C-band radar's extra power or finer beam reduce that deficit. What would the loss do to a rainfall estimate downrange?}
+Even with its extra power and finer beam, the C-band radar still reads visibly weaker (typically one or more standard reflectivity categories lower, e.g.\ a shift of order 10--20 dB depending on rain intensity, consistent with the two-way loss magnitudes computed in Widget 1) than S-band directly behind the heaviest part of the core. Neither the extra power nor the finer beam can reduce this deficit, because both act on \emph{transmission and reception gain}, not on the physical loss the wave suffers while crossing the rain --- attenuation happens to the signal in flight, entirely outside the radar's control once the pulse has left the antenna. Left uncorrected, this deficit propagates directly into an underestimated rainfall rate downrange via $Z=200R^{1.6}$, exactly as quantified in Widget 1's Going Deeper question (roughly an 80\% underestimate at the default 80 mm/h example).
+\end{qa}
+
+\tier{Going deeper}
+\begin{qa}{The two pairs aren't equally clean. Explain why the widget (fixed dish) can separate wavelength's role from power and beamwidth, and these two radars cannot.}
+The detectability widget (Widget 2) fixes the dish size for every band it compares; at a fixed dish, beamwidth is not an independent variable but a direct, known function of wavelength ($\theta=1.27\lambda/D$), and transmit power is held fixed too, so the \emph{only} thing changing between curves is $\lambda$ itself --- letting the $1/\lambda^4$ dependence be isolated cleanly. The two real radars in this image pair, by contrast, differ in power, beamwidth, \emph{and} wavelength all at once, with none of the three held fixed or tied to the others through a known relationship --- there is no way to hold two of the three constant and vary only the third using this pair, so their combined sensitivity difference cannot be decomposed into separate wavelength, beamwidth, and power contributions from the images alone.
+\end{qa}
+\begin{qa}{Quantify it from $P_r\propto P_t/(\theta^2\lambda^2)$: power gives C-band $+3$ dB, the finer beam $+6$ dB, and the shorter wavelength another $+6$ dB --- about $+15$ dB. Now reconcile with the widget's $1/\lambda^4$: at fixed dish $\theta\propto\lambda/D$, so $1/(\theta^2\lambda^2)$ becomes $D^2/\lambda^4$. Given everything stacks for C-band, why does the heavy-core attenuation conclusion still stand?}
+Substituting $\theta=1.27\lambda/D$ into $P_r\propto P_t/(\theta^2\lambda^2)$ gives $P_r\propto P_t D^2/\lambda^4$ --- exactly the fixed-dish $1/\lambda^4$ scaling from Widget 2, confirming that at fixed $D$ the ``finer beam'' contribution is not a separate, additional effect at all; it is already baked into the $1/\lambda^4$ wavelength term (since a finer beam at fixed $D$ is nothing more than a consequence of the shorter wavelength). The two radars here happen to have beamwidths in almost exactly the wavelength ratio (2:1, matching $\lambda_S/\lambda_C\approx2$), implying comparable dish sizes ($\sim$8 m for both) --- so this really is close to the fixed-dish case, the ``finer beam'' credit is the wavelength's own doing, and the only genuinely separate, additional advantage C-band has here is the $2\times$ power ($+3$ dB). None of this changes the attenuation conclusion, because attenuation is not a sensitivity effect at all: it is a loss of signal power \emph{in transit}, entirely independent of how much gain, power, or wavelength advantage the radar has on transmit and receive. However favorably the sensitivity budget stacks for C-band, it says nothing about --- and cannot compensate for --- energy the wave has already lost crossing heavy rain before any of that gain or power ever gets applied.
+\end{qa}
+\clearpage
+\section{Block 5 --- Two Polarizations}
+
+\subsection{Widget 1: Shape --- differential reflectivity (ZDR)}
+
+\tier{Basic}
+\begin{qa}{Slide the drop size from 1 mm to 6 mm. What happens to the drop's shape, and to ZDR?}
+The drop flattens progressively (axis ratio falls from $\approx0.97$ at 1 mm to $\approx0.66$ at 6 mm), and $Z_{DR}$ rises correspondingly, from about $0.33$ dB at 1 mm to about $4.11$ dB at 6 mm --- larger, flatter drops return proportionally more horizontal than vertical power.
+\end{qa}
+\begin{qa}{Now change the amount of rain (log N) at a fixed drop size. Does $Z$ change? Does $Z_{DR}$ change? What does that tell you about what $Z_{DR}$ actually measures?}
+$Z$ changes substantially (raising $\log N$ by 1 raises $Z$ by exactly 10 dB, confirmed numerically: e.g.\ $\log N=3\to28.6$ dBZ, $\log N=4\to38.6$ dBZ at $D=3$ mm), while $Z_{DR}$ stays completely unchanged (both give $\approx1.69$ dB). This confirms directly that $Z_{DR}$ is a pure \emph{ratio} of H to V power depending only on drop shape/size, entirely independent of how many drops (concentration) are present --- unlike $Z$, which depends on both size and number.
+\end{qa}
+
+\tier{A little further}
+\begin{qa}{A small-drop drizzle and a big-drop shower can share the same reflectivity Z. How would ZDR tell them apart --- and why does that matter for estimating rain rate?}
+Because $Z\propto N\cdot D^6$, a large number of small drops and a small number of large drops can combine to give the same $Z$. $Z_{DR}$ breaks this degeneracy because it depends only on drop size (shape), not concentration: drizzle (small, nearly spherical drops) would show low $Z_{DR}$ (near 0 dB), while a big-drop shower would show markedly higher, positive $Z_{DR}$, even at identical $Z$. This matters for rain-rate estimation because the two scenarios, despite sharing a $Z$, correspond to genuinely different rain rates and different $Z$-$R$ relationships --- $Z_{DR}$ supplies the missing piece of information (drop-size context) needed to disambiguate them and improve the rainfall estimate.
+\end{qa}
+\begin{qa}{Hail tumbles as it falls, so on average it looks round to the radar. What ZDR would you expect from a hailstone, compared with a big raindrop of the same Z?}
+A tumbling hailstone presents, on time average, a roughly symmetric (round) shape to the radar regardless of its actual physical form, so its expected $Z_{DR}$ is near $0$ dB --- much lower than a big raindrop of the same $Z$, which (being systematically flattened and consistently oriented base-down as it falls) would show a clearly positive $Z_{DR}$, often several dB.
+\end{qa}
+
+\tier{Going deeper}
+\begin{qa}{ZDR is a ratio of H to V power, so it's independent of calibration and of concentration. Confirm on the widget that raising log N by 1 lifts Z by 10 dB while ZDR doesn't move. Why is an intensive (ratio) variable more robust than an extensive one like Z?}
+Confirmed directly: raising $\log N$ from 3 to 4 lifts $Z$ from $\approx28.6$ to $\approx38.6$ dBZ (exactly $+10$ dB) while $Z_{DR}$ remains at $\approx1.69$ dB in both cases, unchanged. An intensive (ratio) variable like $Z_{DR}$ is more robust than an extensive quantity like $Z$ because any multiplicative error common to both the H and V channels --- a calibration offset, an unaccounted attenuation factor that affects both polarizations equally, or simply not knowing the absolute scatterer concentration --- cancels out exactly in the ratio, leaving $Z_{DR}$ unaffected, whereas $Z$ (an absolute power measurement) is directly and fully corrupted by any such error.
+\end{qa}
+\begin{qa}{Drop shape ties ZDR closely to median drop size. Sketch how combining Z (which depends on size \emph{and} number) with ZDR (which pins the size) lets you solve for both the drop size and the concentration --- something single-pol Z alone cannot do.}
+$Z_{DR}$, being a function only of a characteristic drop size (via the shape--size relationship), can be inverted to give a median drop diameter $D$ directly, independent of concentration. Once $D$ is known from $Z_{DR}$, it can be substituted back into $Z\propto N D^6$ and solved for the number concentration $N$, since $Z$ and $D$ together now over-determine the two-parameter drop-size distribution (size and number) that $Z$ alone --- a single equation with two unknowns --- cannot resolve on its own. This two-variable-from-two-measurements approach is the conceptual basis of dual-pol drop-size-distribution retrievals used operationally to improve rainfall estimation beyond what single-pol $Z$-$R$ relationships can achieve.
+\end{qa}
+
+\subsection{Widget 2: Variety --- the correlation coefficient ($\rho_{hv}$)}
+
+\tier{Basic}
+\begin{qa}{At low variety, what is $\rho_{hv}$, and what kind of target does that value represent?}
+At low variety, $\rho_{hv}$ is high, close to $1.0$ (in the ``uniform'' band above $\approx0.97$), representing a resolution volume filled with a single, homogeneous scatterer type --- the classic signature of pure, uniform rain.
+\end{qa}
+\begin{qa}{Raise the variety and watch the cloud spread and $\rho_{hv}$ fall. At roughly what $\rho_{hv}$ does the label switch from rain to a mixture?}
+The label switches from ``uniform --- rain'' to ``mixed --- hail or melting layer'' at $\rho_{hv}\approx0.97$, and further down to a low-correlation, non-meteorological-leaning regime below $\approx0.85$.
+\end{qa}
+
+\tier{A little further}
+\begin{qa}{A $\rho_{hv}$ near 0.95 sits between pure rain and clutter. Name two \emph{weather} situations that produce intermediate $\rho_{hv}$ (think mixtures of particle types).}
+Two examples: (1) a melting layer / bright band, where snowflakes are transitioning into raindrops and both ice and liquid-coated particles of varying shapes coexist in the same volume; and (2) a mixed rain--hail core within a severe thunderstorm, where liquid raindrops and irregular, tumbling hailstones of different sizes and shapes occupy the same resolution volume simultaneously.
+\end{qa}
+\begin{qa}{Why is $\rho_{hv}$ the best single variable for spotting non-meteorological echoes --- birds, insects, ground clutter, chaff?}
+Non-meteorological scatterers are typically far more varied in shape, orientation, and radar cross-section from particle to particle than natural precipitation --- birds and insects have irregular, constantly changing orientations, and ground clutter returns from a jumble of unrelated surfaces --- so the H and V returns from such a volume are essentially decorrelated, driving $\rho_{hv}$ to low values distinct from the tight, near-unity correlation of homogeneous rain. Because $\rho_{hv}$ directly measures this particle-to-particle uniformity (or lack of it) rather than echo strength, it distinguishes ``real, uniform weather'' from ``anything else'' more directly and reliably than reflectivity, which cannot make this distinction at all.
+\end{qa}
+
+\tier{Going deeper}
+\begin{qa}{$\rho_{hv}$ is a correlation: it falls whenever the H/V ratio \emph{varies} across the volume --- not because any one particle is odd, but because the mix is diverse. Explain why a melting layer (the bright band) shows low $\rho_{hv}$, and why that makes $\rho_{hv}$ a cleaner melting-layer detector than reflectivity.}
+Within a melting layer, a single resolution volume typically contains a range of particles at different stages of melting --- dry snowflakes, partially melted flakes with a thin water coating, and fully melted raindrops --- each with its own distinct H/V scattering ratio. Because $\rho_{hv}$ measures the consistency of that ratio across all particles in the volume, this diversity (not any single particle being unusual) directly lowers $\rho_{hv}$. Reflectivity, in contrast, actually \emph{increases} in the melting layer (the bright band is a local reflectivity enhancement due to the transition from low-density snow to higher-density water-coated particles), which can be confused with a genuine increase in precipitation intensity; $\rho_{hv}$ instead flags the melting layer as a signature of physical inhomogeneity, cleanly separable from a true intensity change.
+\end{qa}
+\begin{qa}{A resolution volume far from the radar is huge (Block 2). Argue how beam broadening alone could lower $\rho_{hv}$, and why $\rho_{hv}$ must always be read alongside the sample size.}
+As range increases, the resolution volume grows as $r^2$ (Block 2), so a far-range gate can span a much larger physical region than a near-range gate --- large enough to encompass genuinely different precipitation types or intensities that would occupy separate, distinguishable gates closer to the radar (e.g.\ a fringe of melting snow alongside pure rain, or the edge of a hail core blended with surrounding rain, all captured in one oversized far-range volume). This geometric mixing lowers $\rho_{hv}$ purely as an artifact of resolution, with no change in the actual local uniformity of any given small parcel of the atmosphere. Consequently, a reduced $\rho_{hv}$ at long range cannot be interpreted with the same confidence as the same value at short range --- it must always be considered alongside how large the sampling volume actually was, since beam broadening alone can manufacture apparent ``variety'' that isn't really there at the scale that matters.
+\end{qa}
+
+\subsection{Widget 3: Phase --- specific differential phase (KDP) and rainfall}
+
+\tier{Basic}
+\begin{qa}{Raise the peak rain rate. What happens to the observed Z behind the cell (recall Block 4), and what happens to $\Phi_{DP}$?}
+The observed $Z$ behind the cell drops further below the true $Z$ as rain rate increases (the attenuation loss grows, consistent with Block 4). $\Phi_{DP}$, in contrast, simply climbs faster and reaches a higher cumulative value across the cell --- it never decreases, and a heavier rain rate produces a steeper (not lower) accumulation.
+\end{qa}
+\begin{qa}{Compare the two rain-rate estimates behind the cell --- R from Z and R from KDP. Which one tracks the truth?}
+The $K_{DP}$-based rain-rate estimate tracks the true rain rate closely and consistently, while the $Z$-based estimate is biased low behind the cell, in proportion to how much two-way attenuation has accumulated by that point --- exactly matching the widget's own labeling (``R from attenuated Z (biased low)'' vs.\ ``R from KDP (immune)'').
+\end{qa}
+
+\tier{A little further}
+\begin{qa}{Switch from C-band to X-band. The Z-based rain rate gets worse behind the cell --- why does the KDP-based one stay correct?}
+At X-band, the attenuation coefficient is roughly five times larger than at C-band, so the two-way power loss behind the cell (and hence the bias in the $Z$-based rain-rate estimate) grows correspondingly worse. $\Phi_{DP}$ and $K_{DP}$, however, are phase measurements, not power measurements: they depend on how much the horizontal wave is \emph{delayed} relative to the vertical wave by passing through non-spherical raindrops, a mechanism entirely distinct from --- and unaffected by --- how much power the wave loses to absorption and scattering. Switching bands changes the phase-shift-per-unit-rain-rate relationship somewhat, but it does not introduce the kind of power-loss bias that corrupts $Z$, so the $K_{DP}$-based estimate remains accurate at X-band just as it was at C-band.
+\end{qa}
+\begin{qa}{$\Phi_{DP}$ only ever rises along the path and never comes back down. Why is a quantity that only accumulates more robust than Z, which can be knocked down by attenuation, miscalibration, or partial beam blocking?}
+Because $\Phi_{DP}$ is monotonically increasing by construction --- it is a running total of phase delay accumulated crossing rain, and phase delay from a physical medium cannot be negative --- any drop in the measured signal along the path (from attenuation, from a systematic calibration offset that under-reports power, or from partial beam blockage reducing the effective illuminated power) simply does not register in $\Phi_{DP}$ at all, since none of those mechanisms alter the phase relationship between the H and V returns. $Z$, by contrast, is a direct power measurement, and every one of those three effects reduces the received power and therefore directly and indistinguishably lowers the reported $Z$ --- making $Z$ vulnerable to several independent failure modes that $\Phi_{DP}$/$K_{DP}$ simply do not share.
+\end{qa}
+
+\tier{Going deeper}
+\begin{qa}{KDP is the \emph{slope} of $\Phi_{DP}$, so it needs $\Phi_{DP}$ to change across several gates --- it's noisy in light rain and undefined in no rain. Explain why KDP excels in heavy rain (where Z-based estimates fail most) but is poor for drizzle, and how you'd blend Z, ZDR, and KDP to cover all intensities.}
+$K_{DP}$ is estimated as a local slope, $K_{DP}=\tfrac12\,d\Phi_{DP}/dr$, which requires $\Phi_{DP}$ to accumulate a measurable amount of phase across the gates used in the slope fit. In heavy rain, drops are large, numerous, and strongly non-spherical, so $\Phi_{DP}$ accumulates quickly and its slope is well-determined even over a short path --- and this is exactly the regime where $Z$-based estimates are most compromised by attenuation (Block 4), so $K_{DP}$'s advantage is greatest precisely where it is needed most. In light rain or drizzle, by contrast, drops are small and only weakly non-spherical, so $\Phi_{DP}$ accumulates very slowly; the resulting tiny phase change over the available gates is easily swamped by measurement noise, making $K_{DP}$ poorly determined (and physically undefined in the complete absence of rain, since there is no phase shift at all to measure a slope of). A blended operational algorithm therefore weights toward reflectivity $Z$ (and its associated $Z$-$R$ relation) for light rain where $Z$ is not yet attenuation-compromised and $K_{DP}$ is too noisy to trust; toward $Z_{DR}$-refined $Z$-$R$ relationships for moderate rain to account for drop-size effects on the $Z$-$R$ relation; and toward $K_{DP}$-based estimates for heavy rain, where $K_{DP}$ is both well-determined and immune to the attenuation that corrupts $Z$ at exactly this intensity.
+\end{qa}
+\begin{qa}{Behind a heavy C-band core, Z is attenuated (biased low) and ZDR is also reduced by \emph{differential} attenuation --- yet KDP is untouched. Explain why a phase measurement survives where both power measurements fail, and why that makes KDP the workhorse for rainfall on the C-band networks this workshop serves.}
+Both $Z$ and $Z_{DR}$ are ultimately power measurements (an absolute power for $Z$, a power \emph{ratio} for $Z_{DR}$), and differential attenuation --- the horizontally polarized wave being attenuated slightly more than the vertically polarized wave, because it interacts more strongly with flattened raindrops --- degrades both: $Z$ directly through overall power loss, and $Z_{DR}$ because the H and V channels are no longer attenuated equally, so even their \emph{ratio} is biased. $\Phi_{DP}$/$K_{DP}$ measure something categorically different: the phase delay accumulated by the H wave relative to the V wave as both travel through non-spherical raindrops, a propagation-\emph{speed} effect rather than a power/amplitude effect. Attenuation (differential or otherwise) reduces the \emph{amplitude} of the returned signal but does not alter this phase relationship, so $K_{DP}$ passes through the same heavy-attenuation environment essentially unaffected. This is exactly why $K_{DP}$-based rainfall estimation is the operational workhorse for C-band networks (which, unlike S-band, face real, frequent attenuation in heavy rain): it is the one polarimetric variable that remains trustworthy in precisely the situation --- heavy rain, strong attenuation --- where accurate rainfall estimation matters most and where the other two variables are least reliable.
+\end{qa}
+
+\subsection{Widget 4: Radar data --- what is the echo made of?}
+
+\tier{Basic}
+\begin{qa}{Find the intense core to the south --- red, with a magenta 60+ dBZ patch in Z. Check its $\rho_{hv}$: is it high ($\sim$1.0) or lowered? A high, uniform $\rho_{hv}$ there says the core is mostly rain, not a chaotic hail mix --- even though Z is very high. Why would Z alone tempt a single-pol radar into calling hail?}
+The southern core's $\rho_{hv}$ is high and uniform (close to 1.0), indicating a homogeneous scatterer population --- consistent with very heavy rain rather than a chaotic mixture of hail and rain. A single-pol radar would be tempted to call this hail purely because $Z$ alone cannot distinguish ``very heavy rain'' from ``hail'': both can produce extremely high reflectivity (60+ dBZ), since $Z$ depends on scatterer size to the sixth power and both large raindrops and hailstones are large scatterers --- $Z$ has no mechanism to tell them apart, and a forecaster relying on $Z$ alone would have to guess, likely erring toward the more hazardous (hail) interpretation given the extreme value.
+\end{qa}
+\begin{qa}{Look at ZDR along the storm's southern, leading edge: moderate-to-high positive ZDR means large, flattened raindrops. Why can Z alone not tell heavy rain from hail, while ZDR and $\rho_{hv}$ together can?}
+As above, $Z$ alone cannot separate heavy rain from hail because both are large scatterers producing comparably extreme reflectivity. $Z_{DR}$ and $\rho_{hv}$ together resolve the ambiguity because they respond oppositely to the two hypotheses: large raindrops are strongly flattened and consistently oriented, giving moderate-to-high, positive $Z_{DR}$ and (being a single, uniform particle type) high $\rho_{hv}$; hail, being irregular and tumbling, gives $Z_{DR}$ near 0 dB and, when mixed with rain, typically depressed $\rho_{hv}$. The combination of moderate/high $Z_{DR}$ with high $\rho_{hv}$ at the southern core therefore points specifically and unambiguously to heavy rain, a distinction $Z$ alone could never make.
+\end{qa}
+
+\tier{A little further}
+\begin{qa}{In $\Phi_{DP}$, follow a radial outward through the heavy southern core: it ramps from low ($\sim$20--40$^\circ$) up to high ($\sim$150--180$^\circ$). That climb is differential phase accumulating through rain, and its slope is KDP. Why does $\Phi_{DP}$ keep rising through the core even where Z behind it is biased low?}
+$\Phi_{DP}$ keeps rising through and behind the core because it accumulates purely from the wave's phase interaction with non-spherical raindrops along the path --- a mechanism entirely independent of the wave's power loss. Even as attenuation is steadily reducing the beam's power (and hence biasing $Z$ low) crossing the same heavy rain, the H and V waves continue accumulating a phase difference at every step, so $\Phi_{DP}$ climbs monotonically through the core regardless of what is simultaneously happening to $Z$ --- exactly the immunity that makes $K_{DP}$ (its slope) a reliable rain-rate indicator in this same location.
+\end{qa}
+\begin{qa}{Now the weak-echo regions to the north and around the edges: ZDR is wild speckle and $\rho_{hv}$ is patchy and low there, while the rain body stays clean and high-$\rho_{hv}$. Is that northern variety real weather or noise / non-meteorological echo? Why do the dual-pol variables turn unreliable where the echo is weak --- and how should that change how far you trust them there?}
+The wild $Z_{DR}$ speckle and patchy, low $\rho_{hv}$ in the weak-echo regions are most consistent with noise and/or non-meteorological scatterers (clear-air return, insects, or other clutter) rather than genuine, coherent weather variety --- real precipitation of any type tends to produce a spatially coherent polarimetric signature, not disorganized speckle. The underlying reason all the dual-pol variables become unreliable at low signal levels is that both $Z_{DR}$ (a power ratio) and $\rho_{hv}$ (a correlation estimate) require adequate signal-to-noise ratio to estimate precisely; as the echo weakens toward the noise floor, the same low-SNR effect that degrades velocity estimation (Block 3, Widget 4) also degrades these polarimetric estimates, inflating their statistical variance and producing exactly the speckled, patchy appearance seen here. Practically, this means dual-pol variables in weak-echo regions should be trusted far less than the same variables in a strong, well-sampled core --- weak-echo polarimetric signatures need corroborating evidence (context, adjacent gates, or simply disregarding them) before being interpreted as real microphysical information.
+\end{qa}
+
+\tier{Going deeper}
+\begin{qa}{Pull all three variables together into one classification of the southern core: high Z + moderate-to-high ZDR + high $\rho_{hv}$. State the hydrometeor signature this points to, then contrast it line by line with what a hail core would instead show in each of Z, ZDR, and $\rho_{hv}$.}
+The combined signature --- high $Z$ (60+ dBZ), moderate-to-high positive $Z_{DR}$, and high, uniform $\rho_{hv}$ --- points unambiguously to \textbf{heavy rain} (large, flattened, uniformly-oriented raindrops in a homogeneous population), not hail. Contrasted variable by variable with a hail signature: $Z$ would be similarly high or even higher for hail (comparable or greater scatterer size); $Z_{DR}$ for hail would instead sit near 0 dB (tumbling hailstones look round on average, unlike consistently-oriented flattened raindrops); and $\rho_{hv}$ for a hail-and-rain mixture would typically be reduced from the near-unity value seen here, reflecting the greater particle-to-particle diversity of a mixed hydrometeor population. This three-line contrast --- $Z$ ambiguous, $Z_{DR}$ decisive, $\rho_{hv}$ confirmatory --- is exactly the logic that an automated hydrometeor classification algorithm formalizes and applies gate by gate.
+\end{qa}
+\begin{qa}{Tie it to Block 4: behind the core $\Phi_{DP}$ has already climbed high, so the beam has crossed heavy rain and the Z behind it is probably attenuated --- yet KDP, the slope of $\Phi_{DP}$, still recovers the rain rate. Explain why you'd trust a KDP-based estimate over a Z-based one behind the core, and why that matters most for the C-band networks.}
+A $\Phi_{DP}$ value that has already climbed to $150$--$180^\circ$ by the far side of the core is direct, quantitative evidence (via the phase-accumulation mechanism established in Widget 3) that the beam has crossed a substantial amount of rain --- and therefore that whatever $Z$ is reported at and beyond that point is likely biased low by real, physical attenuation (Block 4's central finding for C-band). Because $K_{DP}$ (the local slope of that same $\Phi_{DP}$ curve) is immune to exactly this attenuation, a $K_{DP}$-based rain-rate estimate at and behind the core remains trustworthy precisely where the $Z$-based estimate is least trustworthy. This matters most for the C-band networks this workshop serves because C-band, unlike S-band, experiences attenuation frequently and significantly enough (Block 4) that relying on $Z$ alone would produce meaningfully biased rainfall products in exactly the heavy-rain situations where accurate rainfall estimates are most operationally critical --- $K_{DP}$ is not a minor refinement for these networks, but the practical solution to a real, recurring data-quality problem.
+\end{qa}
+
+\end{document}
