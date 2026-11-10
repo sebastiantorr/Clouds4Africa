@@ -1,0 +1,9 @@
+.DS_Store
+.ipynb_checkpoints/
+__pycache__/
+_output/
+dist/
+.jupyterlite.doit.db
+private/
+*.zip
+~$*
